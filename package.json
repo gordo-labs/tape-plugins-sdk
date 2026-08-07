@@ -1,0 +1,40 @@
+{
+  "name": "@music-hub/plugin-sdk",
+  "version": "0.1.0",
+  "description": "Runtime-independent manifest SDK for Music Hub plugins.",
+  "license": "MIT",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gordo-labs/music-hub-plugin-sdk.git"
+  },
+  "bugs": {
+    "url": "https://github.com/gordo-labs/music-hub-plugin-sdk/issues"
+  },
+  "homepage": "https://docs.music-hub.gordo.design/plugins",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "tsc --project tsconfig.json",
+    "test": "npm run build && node --test test/*.test.mjs",
+    "pack:check": "npm run build && npm pack --dry-run"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "LICENSE",
+    "README.md"
+  ],
+  "devDependencies": {
+    "typescript": "^5.4.5"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
