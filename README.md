@@ -1,4 +1,4 @@
-# @music-hub/plugin-sdk
+# @gordo-labs/tape-plugins-sdk
 
 Runtime-independent TypeScript SDK for declaring and validating Music Hub
 plugin manifests. It has no dependency on Electron, the Desktop runtime, the
@@ -10,13 +10,13 @@ The package is available from the public GitHub repository while the first npm
 release is being prepared:
 
 ```bash
-npm install github:gordo-labs/music-hub-plugin-sdk
+npm install github:gordo-labs/tape-plugins-sdk
 ```
 
 Once the npm release is available, use the registry package instead:
 
 ```bash
-npm install @music-hub/plugin-sdk
+npm install @gordo-labs/tape-plugins-sdk
 ```
 
 The package is designed for build-time validation. It does not execute plugin
@@ -25,7 +25,7 @@ code and it does not grant host permissions.
 ## Example
 
 ```ts
-import { definePluginManifest } from '@music-hub/plugin-sdk';
+import { definePluginManifest } from '@gordo-labs/tape-plugins-sdk';
 
 export const manifest = definePluginManifest({
   id: 'community-metadata-notes',

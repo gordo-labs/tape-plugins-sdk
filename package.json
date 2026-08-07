@@ -1,15 +1,15 @@
 {
-  "name": "@music-hub/plugin-sdk",
+  "name": "@gordo-labs/tape-plugins-sdk",
   "version": "0.1.0",
   "description": "Runtime-independent manifest SDK for Music Hub plugins.",
   "license": "MIT",
   "type": "module",
   "repository": {
     "type": "git",
-    "url": "https://github.com/gordo-labs/music-hub-plugin-sdk.git"
+    "url": "https://github.com/gordo-labs/tape-plugins-sdk.git"
   },
   "bugs": {
-    "url": "https://github.com/gordo-labs/music-hub-plugin-sdk/issues"
+    "url": "https://github.com/gordo-labs/tape-plugins-sdk/issues"
   },
   "homepage": "https://docs.music-hub.gordo.design/plugins",
   "engines": {
