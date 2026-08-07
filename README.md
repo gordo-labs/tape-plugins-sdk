@@ -6,17 +6,16 @@ Music Hub database, or any host service.
 
 ## Install
 
-The package is available from the public GitHub repository while the first npm
-release is being prepared:
-
-```bash
-npm install github:gordo-labs/tape-plugins-sdk
-```
-
-Once the npm release is available, use the registry package instead:
+The package is published on npm:
 
 ```bash
 npm install @gordo-labs/tape-plugins-sdk
+```
+
+The source repository is also available for development:
+
+```bash
+npm install github:gordo-labs/tape-plugins-sdk
 ```
 
 The package is designed for build-time validation. It does not execute plugin

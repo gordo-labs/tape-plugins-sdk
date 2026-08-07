@@ -1,6 +1,6 @@
 {
   "name": "@gordo-labs/tape-plugins-sdk",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Runtime-independent manifest SDK for Music Hub plugins.",
   "license": "MIT",
   "type": "module",
