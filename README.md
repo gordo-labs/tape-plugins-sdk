@@ -6,6 +6,15 @@ Music Hub database, or any host service.
 
 ## Install
 
+The package is available from the public GitHub repository while the first npm
+release is being prepared:
+
+```bash
+npm install github:gordo-labs/music-hub-plugin-sdk
+```
+
+Once the npm release is available, use the registry package instead:
+
 ```bash
 npm install @music-hub/plugin-sdk
 ```
