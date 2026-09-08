@@ -53,7 +53,7 @@ export const manifest = definePluginManifest({
 - `assertPluginCompatible` throws when the target is not supported.
 - `PLUGIN_API_VERSION` exposes the current public Plugin API version.
 
-Read the complete contract in the [Music Hub plugin documentation](https://docs.music-hub.gordo.design/plugins).
+Read the complete contract in the [Music Hub plugin documentation](https://docs.tapemusicsuite.com/plugins).
 
 ## Development
 

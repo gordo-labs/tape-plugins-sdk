@@ -11,7 +11,7 @@
   "bugs": {
     "url": "https://github.com/gordo-labs/tape-plugins-sdk/issues"
   },
-  "homepage": "https://docs.music-hub.gordo.design/plugins",
+  "homepage": "https://docs.tapemusicsuite.com/plugins",
   "engines": {
     "node": ">=20"
   },
