@@ -14,7 +14,9 @@ export type PluginChannel = 'stable' | 'beta';
 export type PluginPermission =
   | 'library.read'
   | 'library.metadata.read'
+  | 'library.folders.read'
   | 'metadata.propose'
+  | 'library.organize.propose'
   | 'playback.read'
   | 'network.connect'
   | 'network.fetch'

@@ -9,7 +9,7 @@ export declare const PLUGIN_API_VERSION: "1";
 export type PluginTier = 'core' | 'official' | 'verified' | 'community' | 'local-dev';
 export type PluginDistribution = 'preinstalled' | 'bundled' | 'sideloaded' | 'remote-registry';
 export type PluginChannel = 'stable' | 'beta';
-export type PluginPermission = 'library.read' | 'library.metadata.read' | 'metadata.propose' | 'playback.read' | 'network.connect' | 'network.fetch' | 'network.iroh:music-hub-network' | 'storage.private' | 'storage.addon:music-hub-network' | 'jobs.schedule' | 'ui.contribute' | 'diagnostics.write';
+export type PluginPermission = 'library.read' | 'library.metadata.read' | 'library.folders.read' | 'metadata.propose' | 'library.organize.propose' | 'playback.read' | 'network.connect' | 'network.fetch' | 'network.iroh:music-hub-network' | 'storage.private' | 'storage.addon:music-hub-network' | 'jobs.schedule' | 'ui.contribute' | 'diagnostics.write';
 export interface PluginContribution {
     id: string;
     title: string;
