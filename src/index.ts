@@ -20,6 +20,7 @@ export type PluginPermission =
   | 'playback.read'
   | 'network.connect'
   | 'network.fetch'
+  | 'wishlist.manage'
   | 'network.iroh:music-hub-network'
   | 'storage.private'
   | 'storage.addon:music-hub-network'
@@ -27,11 +28,34 @@ export type PluginPermission =
   | 'ui.contribute'
   | 'diagnostics.write';
 
+/**
+ * The host renders these tokens. A manifest cannot provide markup, SVG, a
+ * filename, or another renderer-controlled icon value.
+ */
+export type PluginWorkspaceNavigationIcon = 'wishlist' | 'plugin';
+export type PluginWorkspaceNavigationSection = 'library' | 'system';
+
+/** A host-owned navigation entry for a declarative plugin workspace. */
+export interface PluginWorkspaceNavigation {
+  placement: 'sidebar';
+  section: PluginWorkspaceNavigationSection;
+  icon: PluginWorkspaceNavigationIcon;
+}
+
 export interface PluginContribution {
   id: string;
   title: string;
   route?: string;
   entity?: 'track' | 'album' | 'artist' | 'playlist';
+}
+
+/**
+ * A workspace is an explicit host route. Navigation is intentionally limited
+ * to known host tokens, so it cannot inject an icon, HTML, or renderer code.
+ */
+export interface PluginWorkspaceContribution extends PluginContribution {
+  route: string;
+  navigation?: PluginWorkspaceNavigation;
 }
 
 export interface PluginManifest {
@@ -64,7 +88,7 @@ export interface PluginManifest {
   isolation: { networkNamespace?: string; protocolAlpn?: string; storageScope?: string };
   compatibility: { musicHubDesktop: string; pluginApi: string };
   contributes?: {
-    workspaces?: PluginContribution[];
+    workspaces?: PluginWorkspaceContribution[];
     detailTabs?: PluginContribution[];
     contextActions?: PluginContribution[];
     commands?: PluginContribution[];
@@ -88,6 +112,24 @@ export class PluginManifestValidationError extends Error {
 
 const ID_PATTERN = /^[a-z0-9]+(?:[a-z0-9-]*[a-z0-9])?$/;
 const SEMVER_PATTERN = /^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?(?:\+[0-9A-Za-z.-]+)?$/;
+const SUPPORTED_PERMISSIONS = new Set<PluginPermission>([
+  'library.read',
+  'library.metadata.read',
+  'library.folders.read',
+  'metadata.propose',
+  'library.organize.propose',
+  'playback.read',
+  'network.connect',
+  'network.fetch',
+  'wishlist.manage',
+  'network.iroh:music-hub-network',
+  'storage.private',
+  'storage.addon:music-hub-network',
+  'jobs.schedule',
+  'ui.contribute',
+  'diagnostics.write',
+]);
+const UI_CONTRIBUTION_KINDS = ['workspaces', 'detailTabs', 'contextActions', 'commands', 'settings'] as const;
 
 /** Validate a manifest without loading plugin code or accessing host internals. */
 export function validatePluginManifest(manifest: unknown): string[] {
@@ -110,9 +152,18 @@ export function validatePluginManifest(manifest: unknown): string[] {
     if (!isCompatibilityRange(manifest.compatibility.musicHubDesktop)) issues.push('manifest.compatibility.musicHubDesktop must be a supported semver range');
     if (!isPluginApiRange(manifest.compatibility.pluginApi)) issues.push('manifest.compatibility.pluginApi must be one or more numeric API versions');
   }
-  if (!Array.isArray(manifest.permissions) || !manifest.permissions.every(isNonEmptyString)) issues.push('manifest.permissions must be a string array');
+  if (!Array.isArray(manifest.permissions) || !manifest.permissions.every(isNonEmptyString)) {
+    issues.push('manifest.permissions must be a string array');
+  } else {
+    for (const permission of manifest.permissions) {
+      if (!SUPPORTED_PERMISSIONS.has(permission as PluginPermission)) {
+        issues.push(`unsupported plugin permission: ${permission}`);
+      }
+    }
+  }
   if (!isRecord(manifest.entrypoints)) issues.push('manifest.entrypoints is required');
   if (!isRecord(manifest.isolation)) issues.push('manifest.isolation is required');
+  validateContributions(manifest, issues);
   if (manifest.tier === 'community' && manifest.distribution === 'preinstalled') issues.push('community plugins cannot be preinstalled');
   return issues;
 }
@@ -205,6 +256,66 @@ function isNonEmptyString(value: unknown): value is string {
 
 function stringValue(value: unknown): string {
   return typeof value === 'string' ? value : '';
+}
+
+function validateContributions(manifest: Record<string, unknown>, issues: string[]): void {
+  if (manifest.contributes == null) return;
+  if (!isRecord(manifest.contributes)) {
+    issues.push('manifest.contributes must be an object when set');
+    return;
+  }
+
+  const contributes = manifest.contributes;
+  const hasUiContributions = UI_CONTRIBUTION_KINDS.some((kind) => {
+    const entries = contributes[kind];
+    return Array.isArray(entries) && entries.length > 0;
+  });
+  if (hasUiContributions && (!Array.isArray(manifest.permissions) || !manifest.permissions.includes('ui.contribute'))) {
+    issues.push('ui.contribute is required for UI contributions');
+  }
+
+  const workspaces = contributes.workspaces;
+  if (workspaces == null) return;
+  if (!Array.isArray(workspaces)) {
+    issues.push('manifest.contributes.workspaces must be an array when set');
+    return;
+  }
+
+  for (const [index, workspace] of workspaces.entries()) {
+    const path = `manifest.contributes.workspaces[${index}]`;
+    if (!isRecord(workspace)) {
+      issues.push(`${path} must be an object`);
+      continue;
+    }
+    if (!isNonEmptyString(workspace.id)) issues.push(`${path}.id is required`);
+    if (!isNonEmptyString(workspace.title)) issues.push(`${path}.title is required`);
+    if (!isSafeWorkspaceRoute(workspace.route)) issues.push(`${path}.route must be a safe absolute route`);
+    if (workspace.navigation != null) validateWorkspaceNavigation(workspace.navigation, `${path}.navigation`, issues);
+  }
+}
+
+function validateWorkspaceNavigation(value: unknown, path: string, issues: string[]): void {
+  if (!isRecord(value)) {
+    issues.push(`${path} must be an object`);
+    return;
+  }
+  if (value.placement !== 'sidebar') issues.push(`${path}.placement must be sidebar`);
+  if (value.section !== 'library' && value.section !== 'system') {
+    issues.push(`${path}.section must be library or system`);
+  }
+  if (value.icon !== 'wishlist' && value.icon !== 'plugin') {
+    issues.push(`${path}.icon must be a known icon token`);
+  }
+}
+
+function isSafeWorkspaceRoute(value: unknown): value is string {
+  if (!isNonEmptyString(value) || !value.startsWith('/') || value.startsWith('//') || /[\\?#\u0000-\u001F]/.test(value)) return false;
+  try {
+    const decoded = decodeURIComponent(value);
+    return !decoded.startsWith('//') && !decoded.includes('\\') && !/(^|\/)\.\.?(\/|$)/.test(decoded);
+  } catch {
+    return false;
+  }
 }
 
 function isJsonSerializable(value: unknown): boolean {

@@ -16,6 +16,24 @@ export class PluginManifestValidationError extends Error {
 }
 const ID_PATTERN = /^[a-z0-9]+(?:[a-z0-9-]*[a-z0-9])?$/;
 const SEMVER_PATTERN = /^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?(?:\+[0-9A-Za-z.-]+)?$/;
+const SUPPORTED_PERMISSIONS = new Set([
+    'library.read',
+    'library.metadata.read',
+    'library.folders.read',
+    'metadata.propose',
+    'library.organize.propose',
+    'playback.read',
+    'network.connect',
+    'network.fetch',
+    'wishlist.manage',
+    'network.iroh:music-hub-network',
+    'storage.private',
+    'storage.addon:music-hub-network',
+    'jobs.schedule',
+    'ui.contribute',
+    'diagnostics.write',
+]);
+const UI_CONTRIBUTION_KINDS = ['workspaces', 'detailTabs', 'contextActions', 'commands', 'settings'];
 /** Validate a manifest without loading plugin code or accessing host internals. */
 export function validatePluginManifest(manifest) {
     const issues = [];
@@ -47,12 +65,21 @@ export function validatePluginManifest(manifest) {
         if (!isPluginApiRange(manifest.compatibility.pluginApi))
             issues.push('manifest.compatibility.pluginApi must be one or more numeric API versions');
     }
-    if (!Array.isArray(manifest.permissions) || !manifest.permissions.every(isNonEmptyString))
+    if (!Array.isArray(manifest.permissions) || !manifest.permissions.every(isNonEmptyString)) {
         issues.push('manifest.permissions must be a string array');
+    }
+    else {
+        for (const permission of manifest.permissions) {
+            if (!SUPPORTED_PERMISSIONS.has(permission)) {
+                issues.push(`unsupported plugin permission: ${permission}`);
+            }
+        }
+    }
     if (!isRecord(manifest.entrypoints))
         issues.push('manifest.entrypoints is required');
     if (!isRecord(manifest.isolation))
         issues.push('manifest.isolation is required');
+    validateContributions(manifest, issues);
     if (manifest.tier === 'community' && manifest.distribution === 'preinstalled')
         issues.push('community plugins cannot be preinstalled');
     return issues;
@@ -140,6 +167,69 @@ function isNonEmptyString(value) {
 }
 function stringValue(value) {
     return typeof value === 'string' ? value : '';
+}
+function validateContributions(manifest, issues) {
+    if (manifest.contributes == null)
+        return;
+    if (!isRecord(manifest.contributes)) {
+        issues.push('manifest.contributes must be an object when set');
+        return;
+    }
+    const contributes = manifest.contributes;
+    const hasUiContributions = UI_CONTRIBUTION_KINDS.some((kind) => {
+        const entries = contributes[kind];
+        return Array.isArray(entries) && entries.length > 0;
+    });
+    if (hasUiContributions && (!Array.isArray(manifest.permissions) || !manifest.permissions.includes('ui.contribute'))) {
+        issues.push('ui.contribute is required for UI contributions');
+    }
+    const workspaces = contributes.workspaces;
+    if (workspaces == null)
+        return;
+    if (!Array.isArray(workspaces)) {
+        issues.push('manifest.contributes.workspaces must be an array when set');
+        return;
+    }
+    for (const [index, workspace] of workspaces.entries()) {
+        const path = `manifest.contributes.workspaces[${index}]`;
+        if (!isRecord(workspace)) {
+            issues.push(`${path} must be an object`);
+            continue;
+        }
+        if (!isNonEmptyString(workspace.id))
+            issues.push(`${path}.id is required`);
+        if (!isNonEmptyString(workspace.title))
+            issues.push(`${path}.title is required`);
+        if (!isSafeWorkspaceRoute(workspace.route))
+            issues.push(`${path}.route must be a safe absolute route`);
+        if (workspace.navigation != null)
+            validateWorkspaceNavigation(workspace.navigation, `${path}.navigation`, issues);
+    }
+}
+function validateWorkspaceNavigation(value, path, issues) {
+    if (!isRecord(value)) {
+        issues.push(`${path} must be an object`);
+        return;
+    }
+    if (value.placement !== 'sidebar')
+        issues.push(`${path}.placement must be sidebar`);
+    if (value.section !== 'library' && value.section !== 'system') {
+        issues.push(`${path}.section must be library or system`);
+    }
+    if (value.icon !== 'wishlist' && value.icon !== 'plugin') {
+        issues.push(`${path}.icon must be a known icon token`);
+    }
+}
+function isSafeWorkspaceRoute(value) {
+    if (!isNonEmptyString(value) || !value.startsWith('/') || value.startsWith('//') || /[\\?#\u0000-\u001F]/.test(value))
+        return false;
+    try {
+        const decoded = decodeURIComponent(value);
+        return !decoded.startsWith('//') && !decoded.includes('\\') && !/(^|\/)\.\.?(\/|$)/.test(decoded);
+    }
+    catch {
+        return false;
+    }
 }
 function isJsonSerializable(value) {
     if (value === null || typeof value === 'string' || typeof value === 'boolean')

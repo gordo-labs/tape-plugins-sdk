@@ -9,12 +9,32 @@ export declare const PLUGIN_API_VERSION: "1";
 export type PluginTier = 'core' | 'official' | 'verified' | 'community' | 'local-dev';
 export type PluginDistribution = 'preinstalled' | 'bundled' | 'sideloaded' | 'remote-registry';
 export type PluginChannel = 'stable' | 'beta';
-export type PluginPermission = 'library.read' | 'library.metadata.read' | 'library.folders.read' | 'metadata.propose' | 'library.organize.propose' | 'playback.read' | 'network.connect' | 'network.fetch' | 'network.iroh:music-hub-network' | 'storage.private' | 'storage.addon:music-hub-network' | 'jobs.schedule' | 'ui.contribute' | 'diagnostics.write';
+export type PluginPermission = 'library.read' | 'library.metadata.read' | 'library.folders.read' | 'metadata.propose' | 'library.organize.propose' | 'playback.read' | 'network.connect' | 'network.fetch' | 'wishlist.manage' | 'network.iroh:music-hub-network' | 'storage.private' | 'storage.addon:music-hub-network' | 'jobs.schedule' | 'ui.contribute' | 'diagnostics.write';
+/**
+ * The host renders these tokens. A manifest cannot provide markup, SVG, a
+ * filename, or another renderer-controlled icon value.
+ */
+export type PluginWorkspaceNavigationIcon = 'wishlist' | 'plugin';
+export type PluginWorkspaceNavigationSection = 'library' | 'system';
+/** A host-owned navigation entry for a declarative plugin workspace. */
+export interface PluginWorkspaceNavigation {
+    placement: 'sidebar';
+    section: PluginWorkspaceNavigationSection;
+    icon: PluginWorkspaceNavigationIcon;
+}
 export interface PluginContribution {
     id: string;
     title: string;
     route?: string;
     entity?: 'track' | 'album' | 'artist' | 'playlist';
+}
+/**
+ * A workspace is an explicit host route. Navigation is intentionally limited
+ * to known host tokens, so it cannot inject an icon, HTML, or renderer code.
+ */
+export interface PluginWorkspaceContribution extends PluginContribution {
+    route: string;
+    navigation?: PluginWorkspaceNavigation;
 }
 export interface PluginManifest {
     id: string;
@@ -57,7 +77,7 @@ export interface PluginManifest {
         pluginApi: string;
     };
     contributes?: {
-        workspaces?: PluginContribution[];
+        workspaces?: PluginWorkspaceContribution[];
         detailTabs?: PluginContribution[];
         contextActions?: PluginContribution[];
         commands?: PluginContribution[];

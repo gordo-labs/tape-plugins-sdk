@@ -45,6 +45,32 @@ export const manifest = definePluginManifest({
 });
 ```
 
+## Declarative workspace navigation
+
+Workspaces may opt into a host-owned sidebar entry. Navigation is data, not
+executable UI: `placement`, `section`, and `icon` are restricted to published
+tokens. Plugin manifests cannot provide SVG, HTML, file paths, or arbitrary
+renderer code.
+
+```ts
+contributes: {
+  workspaces: [{
+    id: 'wishlist',
+    title: 'Wishlist',
+    route: '/addons/catalog-wishlist',
+    navigation: {
+      placement: 'sidebar',
+      section: 'library',
+      icon: 'wishlist',
+    },
+  }],
+}
+```
+
+`wishlist.manage` is the host capability for the reviewed core Wishlist
+add-on. It authorizes host-owned wishlist mutations; it does not expose the
+database or permit direct SQL access.
+
 ## API
 
 - `definePluginManifest` validates and deeply freezes a manifest.
