@@ -1,0 +1,458 @@
+{
+  "policy": {
+    "currentVersion": "2",
+    "supportedVersions": [
+      "1",
+      "2"
+    ],
+    "additiveWithinMajor": true,
+    "proposedApisRequireDeveloperMode": true,
+    "minimumDeprecationWindow": "one Tape minor release",
+    "changelog": "https://docs.tapemusicsuite.com/plugins/api-changelog"
+  },
+  "permissions": [
+    {
+      "id": "library.read",
+      "title": "Read your library",
+      "description": "Search and list tracks, albums, artists and playlists. File locations are never shared.",
+      "risk": "low",
+      "status": "available"
+    },
+    {
+      "id": "library.metadata.read",
+      "title": "Read enriched metadata",
+      "description": "Read MusicBrainz and Discogs identifiers, labels, genres, BPM, key and analysis data.",
+      "risk": "low",
+      "status": "available"
+    },
+    {
+      "id": "library.folders.read",
+      "title": "Read folder structure",
+      "description": "See your library folders and where each file sits inside them, as paths relative to each folder.",
+      "risk": "medium",
+      "status": "available"
+    },
+    {
+      "id": "metadata.propose",
+      "title": "Suggest metadata changes",
+      "description": "Suggest field changes. You review every suggestion; nothing changes until you accept it.",
+      "risk": "low",
+      "status": "available"
+    },
+    {
+      "id": "library.organize.propose",
+      "title": "Suggest file organization",
+      "description": "Prepare a rename or move plan for you to review. The plugin cannot move or rename files.",
+      "risk": "low",
+      "status": "available"
+    },
+    {
+      "id": "playback.read",
+      "title": "See what is playing",
+      "description": "Read the current track, queue and playback state, and be notified when playback changes.",
+      "risk": "low",
+      "status": "available"
+    },
+    {
+      "id": "network.fetch",
+      "title": "Connect to the internet",
+      "description": "Make HTTPS requests to the domains listed in the manifest, and only those.",
+      "risk": "high",
+      "status": "available"
+    },
+    {
+      "id": "storage.private",
+      "title": "Store its own data",
+      "description": "Keep settings and data in private storage that no other plugin can read.",
+      "risk": "low",
+      "status": "available"
+    },
+    {
+      "id": "jobs.schedule",
+      "title": "Run background tasks",
+      "description": "Run tasks in the background within the limits Tape sets. They pause while Tape is busy.",
+      "risk": "medium",
+      "status": "available"
+    },
+    {
+      "id": "ui.contribute",
+      "title": "Add to the interface",
+      "description": "Add menu items, panels, views and settings in the places listed in the manifest.",
+      "risk": "low",
+      "status": "available"
+    },
+    {
+      "id": "notifications.show",
+      "title": "Show notifications",
+      "description": "Show short in-app notifications.",
+      "risk": "low",
+      "status": "available"
+    },
+    {
+      "id": "diagnostics.write",
+      "title": "Write diagnostic logs",
+      "description": "Write bounded logs to its own plugin console.",
+      "risk": "low",
+      "status": "available"
+    },
+    {
+      "id": "metadata.apply",
+      "title": "Apply approved metadata changes",
+      "description": "Apply a batch of metadata changes you approved, with undo.",
+      "risk": "medium",
+      "status": "reserved"
+    },
+    {
+      "id": "library.organize.apply",
+      "title": "Apply an approved file plan",
+      "description": "Ask Tape to rename or move files according to a plan you approved, with undo.",
+      "risk": "high",
+      "status": "reserved"
+    },
+    {
+      "id": "tags.write.propose",
+      "title": "Suggest tag writes",
+      "description": "Suggest writing tags into audio files. You review every change.",
+      "risk": "medium",
+      "status": "reserved"
+    },
+    {
+      "id": "playlists.write",
+      "title": "Create and edit playlists",
+      "description": "Create playlists and add tracks to playlists it created.",
+      "risk": "medium",
+      "status": "reserved"
+    },
+    {
+      "id": "playback.control",
+      "title": "Control playback",
+      "description": "Play, pause, skip and queue tracks.",
+      "risk": "medium",
+      "status": "reserved"
+    },
+    {
+      "id": "ui.theme",
+      "title": "Change how Tape looks",
+      "description": "Replace colors, typography and spacing with a theme.",
+      "risk": "low",
+      "status": "reserved"
+    },
+    {
+      "id": "network.connect",
+      "title": "Open network connections",
+      "description": "Open direct network connections. Reserved for core add-ons.",
+      "risk": "high",
+      "status": "core-only"
+    },
+    {
+      "id": "network.iroh:music-hub-network",
+      "title": "Music Hub Network transport",
+      "description": "Use the Music Hub Network Iroh namespace. Core add-on only.",
+      "risk": "high",
+      "status": "core-only"
+    },
+    {
+      "id": "storage.addon:music-hub-network",
+      "title": "Music Hub Network storage",
+      "description": "Use the Music Hub Network storage scope. Core add-on only.",
+      "risk": "medium",
+      "status": "core-only"
+    }
+  ],
+  "extensionPoints": [
+    {
+      "id": "sidebar.item",
+      "form": "declarative",
+      "status": "available",
+      "maxItemsPerPlugin": 2,
+      "description": "Entry in the sidebar that opens one of the plugin workspaces."
+    },
+    {
+      "id": "workspace",
+      "form": "iframe",
+      "status": "available",
+      "maxItemsPerPlugin": 3,
+      "description": "Full view inside the main area, rendered from entrypoints.ui."
+    },
+    {
+      "id": "contextMenu.track",
+      "form": "declarative",
+      "status": "available",
+      "maxItemsPerPlugin": 3,
+      "entity": "track",
+      "description": "Right-click menu item on a track."
+    },
+    {
+      "id": "contextMenu.album",
+      "form": "declarative",
+      "status": "available",
+      "maxItemsPerPlugin": 3,
+      "entity": "album",
+      "description": "Right-click menu item on an album."
+    },
+    {
+      "id": "contextMenu.artist",
+      "form": "declarative",
+      "status": "available",
+      "maxItemsPerPlugin": 3,
+      "entity": "artist",
+      "description": "Right-click menu item on an artist."
+    },
+    {
+      "id": "contextMenu.label",
+      "form": "declarative",
+      "status": "available",
+      "maxItemsPerPlugin": 3,
+      "entity": "label",
+      "description": "Right-click menu item on a label."
+    },
+    {
+      "id": "contextMenu.playlist",
+      "form": "declarative",
+      "status": "available",
+      "maxItemsPerPlugin": 3,
+      "entity": "playlist",
+      "description": "Right-click menu item on a playlist."
+    },
+    {
+      "id": "contextMenu.folder",
+      "form": "declarative",
+      "status": "available",
+      "maxItemsPerPlugin": 3,
+      "entity": "folder",
+      "description": "Right-click menu item on a library folder."
+    },
+    {
+      "id": "contextMenu.selection",
+      "form": "declarative",
+      "status": "available",
+      "maxItemsPerPlugin": 3,
+      "entity": "selection",
+      "description": "Right-click menu item on a multi-track selection."
+    },
+    {
+      "id": "detail.section.track",
+      "form": "iframe",
+      "status": "available",
+      "maxItemsPerPlugin": 1,
+      "entity": "track",
+      "description": "Section in the track details view."
+    },
+    {
+      "id": "detail.section.album",
+      "form": "iframe",
+      "status": "available",
+      "maxItemsPerPlugin": 1,
+      "entity": "album",
+      "description": "Section in the album view."
+    },
+    {
+      "id": "detail.section.artist",
+      "form": "iframe",
+      "status": "available",
+      "maxItemsPerPlugin": 1,
+      "entity": "artist",
+      "description": "Section in the artist view."
+    },
+    {
+      "id": "detail.section.playlist",
+      "form": "iframe",
+      "status": "available",
+      "maxItemsPerPlugin": 1,
+      "entity": "playlist",
+      "description": "Section in the playlist view."
+    },
+    {
+      "id": "row.badge.track",
+      "form": "declarative",
+      "status": "available",
+      "maxItemsPerPlugin": 1,
+      "entity": "track",
+      "description": "Short text badge in track rows, computed by a worker command."
+    },
+    {
+      "id": "settings.section",
+      "form": "declarative",
+      "status": "available",
+      "maxItemsPerPlugin": 1,
+      "description": "Settings form generated by Tape from manifest.settings."
+    },
+    {
+      "id": "command",
+      "form": "declarative",
+      "status": "available",
+      "maxItemsPerPlugin": 10,
+      "description": "Command in the command palette."
+    },
+    {
+      "id": "player.panel",
+      "form": "iframe",
+      "status": "available",
+      "maxItemsPerPlugin": 1,
+      "description": "Panel next to the player, such as lyrics or notes."
+    },
+    {
+      "id": "library.filters",
+      "form": "declarative",
+      "status": "reserved",
+      "maxItemsPerPlugin": 2,
+      "description": "Library filter applied by Tape over track fields."
+    },
+    {
+      "id": "player.controls",
+      "form": "declarative",
+      "status": "reserved",
+      "maxItemsPerPlugin": 1,
+      "description": "Compact control in the player bar."
+    },
+    {
+      "id": "toolbar.library",
+      "form": "declarative",
+      "status": "reserved",
+      "maxItemsPerPlugin": 2,
+      "description": "Action in the library header."
+    },
+    {
+      "id": "statusbar.item",
+      "form": "declarative",
+      "status": "reserved",
+      "maxItemsPerPlugin": 1,
+      "description": "Item in the status bar."
+    },
+    {
+      "id": "skin",
+      "form": "iframe",
+      "status": "reserved",
+      "maxItemsPerPlugin": 1,
+      "description": "Full replacement of the Desktop interface over the client core."
+    }
+  ],
+  "iconTokens": [
+    "plugin",
+    "wishlist",
+    "music",
+    "album",
+    "artist",
+    "playlist",
+    "folder",
+    "tag",
+    "search",
+    "sparkle",
+    "link",
+    "upload",
+    "download",
+    "share",
+    "chart",
+    "clock",
+    "star",
+    "heart",
+    "info",
+    "settings"
+  ],
+  "events": [
+    {
+      "name": "track.added",
+      "permission": "library.read"
+    },
+    {
+      "name": "track.updated",
+      "permission": "library.read"
+    },
+    {
+      "name": "track.deleted",
+      "permission": "library.read"
+    },
+    {
+      "name": "enrichment.done",
+      "permission": "library.metadata.read"
+    },
+    {
+      "name": "playback.started",
+      "permission": "playback.read"
+    }
+  ],
+  "workerApi": [
+    {
+      "method": "library.getTrack",
+      "permission": "library.read"
+    },
+    {
+      "method": "library.getTracks",
+      "permission": "library.read"
+    },
+    {
+      "method": "library.listTracks",
+      "permission": "library.read"
+    },
+    {
+      "method": "library.listPlaylists",
+      "permission": "library.read"
+    },
+    {
+      "method": "library.getPlaylistTrackIds",
+      "permission": "library.read"
+    },
+    {
+      "method": "library.listFolders",
+      "permission": "library.folders.read"
+    },
+    {
+      "method": "metadata.propose",
+      "permission": "metadata.propose"
+    },
+    {
+      "method": "organize.proposePlan",
+      "permission": "library.organize.propose"
+    },
+    {
+      "method": "playback.getState",
+      "permission": "playback.read"
+    },
+    {
+      "method": "net.fetch",
+      "permission": "network.fetch"
+    },
+    {
+      "method": "storage.get",
+      "permission": "storage.private"
+    },
+    {
+      "method": "storage.set",
+      "permission": "storage.private"
+    },
+    {
+      "method": "storage.delete",
+      "permission": "storage.private"
+    },
+    {
+      "method": "storage.keys",
+      "permission": "storage.private"
+    },
+    {
+      "method": "settings.get",
+      "permission": null
+    },
+    {
+      "method": "notifications.show",
+      "permission": "notifications.show"
+    }
+  ],
+  "hardLimits": {
+    "workerMemoryBytes": 67108864,
+    "workerStackBytes": 262144,
+    "turnTimeoutMs": 1000,
+    "handlerTimeoutMs": 30000,
+    "maxConcurrentHostCalls": 8,
+    "hostCallsPerMinute": 600,
+    "maxPageSize": 200,
+    "maxMessageBytes": 262144,
+    "networkRequestsPerMinute": 60,
+    "networkMaxResponseBytes": 2097152,
+    "networkTimeoutMs": 15000,
+    "storageQuotaBytes": 1048576,
+    "storageMaxValueBytes": 65536,
+    "notificationsPerMinute": 6,
+    "logLinesPerMinute": 120,
+    "failuresBeforeDisable": 3
+  }
+}

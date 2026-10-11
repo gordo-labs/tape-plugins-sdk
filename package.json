@@ -1,7 +1,7 @@
 {
   "name": "@gordo-labs/tape-plugins-sdk",
-  "version": "0.2.0",
-  "description": "Runtime-independent manifest SDK for Music Hub plugins.",
+  "version": "0.3.0-beta.0",
+  "description": "Manifest contract, permission and extension-point catalogs, and worker API types for Tape plugins.",
   "license": "MIT",
   "type": "module",
   "repository": {
@@ -16,7 +16,7 @@
     "node": ">=20"
   },
   "scripts": {
-    "build": "tsc --project tsconfig.json",
+    "build": "tsc --project tsconfig.json && node scripts/build-schemas.mjs",
     "prepare": "npm run build",
     "test": "npm run build && node --test test/*.test.mjs",
     "pack:check": "npm run build && npm pack --dry-run"
@@ -25,10 +25,12 @@
     ".": {
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
-    }
+    },
+    "./schemas/*": "./schemas/*"
   },
   "files": [
     "dist",
+    "schemas",
     "src",
     "tsconfig.json",
     "LICENSE",

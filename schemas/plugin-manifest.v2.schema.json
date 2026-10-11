@@ -1,0 +1,1583 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://docs.tapemusicsuite.com/schemas/plugin-manifest.v2.schema.json",
+  "title": "Tape plugin manifest v2",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "id",
+    "name",
+    "version",
+    "description",
+    "kind",
+    "tier",
+    "engines",
+    "permissions",
+    "entrypoints"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "schemaVersion": {
+      "const": 2
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:[a-z0-9-]*[a-z0-9])?$",
+      "maxLength": 64
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 60
+    },
+    "version": {
+      "type": "string",
+      "description": "semver"
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 280
+    },
+    "kind": {
+      "enum": [
+        "plugin",
+        "theme",
+        "module"
+      ]
+    },
+    "tier": {
+      "enum": [
+        "core",
+        "official",
+        "verified",
+        "community",
+        "local-dev"
+      ]
+    },
+    "publisher": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "url": {
+          "type": "string",
+          "format": "uri"
+        }
+      }
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "license"
+      ],
+      "properties": {
+        "repository": {
+          "type": "string",
+          "format": "uri"
+        },
+        "license": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "engines": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "tape",
+        "pluginApi"
+      ],
+      "properties": {
+        "tape": {
+          "type": "string",
+          "examples": [
+            ">=0.6.0"
+          ]
+        },
+        "pluginApi": {
+          "type": "string",
+          "examples": [
+            "2"
+          ]
+        }
+      }
+    },
+    "permissions": {
+      "type": "array",
+      "uniqueItems": true,
+      "maxItems": 24,
+      "items": {
+        "enum": [
+          "library.read",
+          "library.metadata.read",
+          "library.folders.read",
+          "metadata.propose",
+          "library.organize.propose",
+          "playback.read",
+          "network.fetch",
+          "storage.private",
+          "jobs.schedule",
+          "ui.contribute",
+          "notifications.show",
+          "diagnostics.write",
+          "metadata.apply",
+          "library.organize.apply",
+          "tags.write.propose",
+          "playlists.write",
+          "playback.control",
+          "ui.theme",
+          "network.connect",
+          "network.iroh:music-hub-network",
+          "storage.addon:music-hub-network"
+        ]
+      }
+    },
+    "network": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "allow"
+      ],
+      "properties": {
+        "allow": {
+          "type": "array",
+          "maxItems": 10,
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "dataDisclosure": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "domain",
+          "data",
+          "purpose"
+        ],
+        "properties": {
+          "domain": {
+            "type": "string"
+          },
+          "data": {
+            "type": "string"
+          },
+          "purpose": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "activation": {
+      "type": "array",
+      "maxItems": 20,
+      "items": {
+        "type": "string",
+        "pattern": "^(onStartup|onCommand:.+|onEvent:.+|onView:.+)$"
+      }
+    },
+    "entrypoints": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "worker": {
+          "type": "string"
+        },
+        "ui": {
+          "type": "string"
+        },
+        "theme": {
+          "type": "string"
+        }
+      }
+    },
+    "contributes": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "sidebar.item": {
+          "type": "array",
+          "maxItems": 2,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "title"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:[a-z0-9.-]*[a-z0-9])?$",
+                "maxLength": 64
+              },
+              "title": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 60
+              },
+              "icon": {
+                "enum": [
+                  "plugin",
+                  "wishlist",
+                  "music",
+                  "album",
+                  "artist",
+                  "playlist",
+                  "folder",
+                  "tag",
+                  "search",
+                  "sparkle",
+                  "link",
+                  "upload",
+                  "download",
+                  "share",
+                  "chart",
+                  "clock",
+                  "star",
+                  "heart",
+                  "info",
+                  "settings"
+                ]
+              },
+              "command": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:[a-z0-9.-]*[a-z0-9])?$"
+              },
+              "workspace": {
+                "type": "string"
+              },
+              "view": {
+                "type": "string",
+                "pattern": "^#/[A-Za-z0-9/_-]{0,100}$"
+              }
+            }
+          },
+          "description": "Entry in the sidebar that opens one of the plugin workspaces."
+        },
+        "workspace": {
+          "type": "array",
+          "maxItems": 3,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "title"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:[a-z0-9.-]*[a-z0-9])?$",
+                "maxLength": 64
+              },
+              "title": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 60
+              },
+              "icon": {
+                "enum": [
+                  "plugin",
+                  "wishlist",
+                  "music",
+                  "album",
+                  "artist",
+                  "playlist",
+                  "folder",
+                  "tag",
+                  "search",
+                  "sparkle",
+                  "link",
+                  "upload",
+                  "download",
+                  "share",
+                  "chart",
+                  "clock",
+                  "star",
+                  "heart",
+                  "info",
+                  "settings"
+                ]
+              },
+              "command": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:[a-z0-9.-]*[a-z0-9])?$"
+              },
+              "workspace": {
+                "type": "string"
+              },
+              "view": {
+                "type": "string",
+                "pattern": "^#/[A-Za-z0-9/_-]{0,100}$"
+              }
+            }
+          },
+          "description": "Full view inside the main area, rendered from entrypoints.ui."
+        },
+        "contextMenu.track": {
+          "type": "array",
+          "maxItems": 3,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "title"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:[a-z0-9.-]*[a-z0-9])?$",
+                "maxLength": 64
+              },
+              "title": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 60
+              },
+              "icon": {
+                "enum": [
+                  "plugin",
+                  "wishlist",
+                  "music",
+                  "album",
+                  "artist",
+                  "playlist",
+                  "folder",
+                  "tag",
+                  "search",
+                  "sparkle",
+                  "link",
+                  "upload",
+                  "download",
+                  "share",
+                  "chart",
+                  "clock",
+                  "star",
+                  "heart",
+                  "info",
+                  "settings"
+                ]
+              },
+              "command": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:[a-z0-9.-]*[a-z0-9])?$"
+              },
+              "workspace": {
+                "type": "string"
+              },
+              "view": {
+                "type": "string",
+                "pattern": "^#/[A-Za-z0-9/_-]{0,100}$"
+              }
+            }
+          },
+          "description": "Right-click menu item on a track."
+        },
+        "contextMenu.album": {
+          "type": "array",
+          "maxItems": 3,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "title"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:[a-z0-9.-]*[a-z0-9])?$",
+                "maxLength": 64
+              },
+              "title": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 60
+              },
+              "icon": {
+                "enum": [
+                  "plugin",
+                  "wishlist",
+                  "music",
+                  "album",
+                  "artist",
+                  "playlist",
+                  "folder",
+                  "tag",
+                  "search",
+                  "sparkle",
+                  "link",
+                  "upload",
+                  "download",
+                  "share",
+                  "chart",
+                  "clock",
+                  "star",
+                  "heart",
+                  "info",
+                  "settings"
+                ]
+              },
+              "command": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:[a-z0-9.-]*[a-z0-9])?$"
+              },
+              "workspace": {
+                "type": "string"
+              },
+              "view": {
+                "type": "string",
+                "pattern": "^#/[A-Za-z0-9/_-]{0,100}$"
+              }
+            }
+          },
+          "description": "Right-click menu item on an album."
+        },
+        "contextMenu.artist": {
+          "type": "array",
+          "maxItems": 3,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "title"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:[a-z0-9.-]*[a-z0-9])?$",
+                "maxLength": 64
+              },
+              "title": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 60
+              },
+              "icon": {
+                "enum": [
+                  "plugin",
+                  "wishlist",
+                  "music",
+                  "album",
+                  "artist",
+                  "playlist",
+                  "folder",
+                  "tag",
+                  "search",
+                  "sparkle",
+                  "link",
+                  "upload",
+                  "download",
+                  "share",
+                  "chart",
+                  "clock",
+                  "star",
+                  "heart",
+                  "info",
+                  "settings"
+                ]
+              },
+              "command": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:[a-z0-9.-]*[a-z0-9])?$"
+              },
+              "workspace": {
+                "type": "string"
+              },
+              "view": {
+                "type": "string",
+                "pattern": "^#/[A-Za-z0-9/_-]{0,100}$"
+              }
+            }
+          },
+          "description": "Right-click menu item on an artist."
+        },
+        "contextMenu.label": {
+          "type": "array",
+          "maxItems": 3,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "title"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:[a-z0-9.-]*[a-z0-9])?$",
+                "maxLength": 64
+              },
+              "title": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 60
+              },
+              "icon": {
+                "enum": [
+                  "plugin",
+                  "wishlist",
+                  "music",
+                  "album",
+                  "artist",
+                  "playlist",
+                  "folder",
+                  "tag",
+                  "search",
+                  "sparkle",
+                  "link",
+                  "upload",
+                  "download",
+                  "share",
+                  "chart",
+                  "clock",
+                  "star",
+                  "heart",
+                  "info",
+                  "settings"
+                ]
+              },
+              "command": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:[a-z0-9.-]*[a-z0-9])?$"
+              },
+              "workspace": {
+                "type": "string"
+              },
+              "view": {
+                "type": "string",
+                "pattern": "^#/[A-Za-z0-9/_-]{0,100}$"
+              }
+            }
+          },
+          "description": "Right-click menu item on a label."
+        },
+        "contextMenu.playlist": {
+          "type": "array",
+          "maxItems": 3,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "title"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:[a-z0-9.-]*[a-z0-9])?$",
+                "maxLength": 64
+              },
+              "title": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 60
+              },
+              "icon": {
+                "enum": [
+                  "plugin",
+                  "wishlist",
+                  "music",
+                  "album",
+                  "artist",
+                  "playlist",
+                  "folder",
+                  "tag",
+                  "search",
+                  "sparkle",
+                  "link",
+                  "upload",
+                  "download",
+                  "share",
+                  "chart",
+                  "clock",
+                  "star",
+                  "heart",
+                  "info",
+                  "settings"
+                ]
+              },
+              "command": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:[a-z0-9.-]*[a-z0-9])?$"
+              },
+              "workspace": {
+                "type": "string"
+              },
+              "view": {
+                "type": "string",
+                "pattern": "^#/[A-Za-z0-9/_-]{0,100}$"
+              }
+            }
+          },
+          "description": "Right-click menu item on a playlist."
+        },
+        "contextMenu.folder": {
+          "type": "array",
+          "maxItems": 3,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "title"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:[a-z0-9.-]*[a-z0-9])?$",
+                "maxLength": 64
+              },
+              "title": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 60
+              },
+              "icon": {
+                "enum": [
+                  "plugin",
+                  "wishlist",
+                  "music",
+                  "album",
+                  "artist",
+                  "playlist",
+                  "folder",
+                  "tag",
+                  "search",
+                  "sparkle",
+                  "link",
+                  "upload",
+                  "download",
+                  "share",
+                  "chart",
+                  "clock",
+                  "star",
+                  "heart",
+                  "info",
+                  "settings"
+                ]
+              },
+              "command": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:[a-z0-9.-]*[a-z0-9])?$"
+              },
+              "workspace": {
+                "type": "string"
+              },
+              "view": {
+                "type": "string",
+                "pattern": "^#/[A-Za-z0-9/_-]{0,100}$"
+              }
+            }
+          },
+          "description": "Right-click menu item on a library folder."
+        },
+        "contextMenu.selection": {
+          "type": "array",
+          "maxItems": 3,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "title"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:[a-z0-9.-]*[a-z0-9])?$",
+                "maxLength": 64
+              },
+              "title": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 60
+              },
+              "icon": {
+                "enum": [
+                  "plugin",
+                  "wishlist",
+                  "music",
+                  "album",
+                  "artist",
+                  "playlist",
+                  "folder",
+                  "tag",
+                  "search",
+                  "sparkle",
+                  "link",
+                  "upload",
+                  "download",
+                  "share",
+                  "chart",
+                  "clock",
+                  "star",
+                  "heart",
+                  "info",
+                  "settings"
+                ]
+              },
+              "command": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:[a-z0-9.-]*[a-z0-9])?$"
+              },
+              "workspace": {
+                "type": "string"
+              },
+              "view": {
+                "type": "string",
+                "pattern": "^#/[A-Za-z0-9/_-]{0,100}$"
+              }
+            }
+          },
+          "description": "Right-click menu item on a multi-track selection."
+        },
+        "detail.section.track": {
+          "type": "array",
+          "maxItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "title"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:[a-z0-9.-]*[a-z0-9])?$",
+                "maxLength": 64
+              },
+              "title": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 60
+              },
+              "icon": {
+                "enum": [
+                  "plugin",
+                  "wishlist",
+                  "music",
+                  "album",
+                  "artist",
+                  "playlist",
+                  "folder",
+                  "tag",
+                  "search",
+                  "sparkle",
+                  "link",
+                  "upload",
+                  "download",
+                  "share",
+                  "chart",
+                  "clock",
+                  "star",
+                  "heart",
+                  "info",
+                  "settings"
+                ]
+              },
+              "command": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:[a-z0-9.-]*[a-z0-9])?$"
+              },
+              "workspace": {
+                "type": "string"
+              },
+              "view": {
+                "type": "string",
+                "pattern": "^#/[A-Za-z0-9/_-]{0,100}$"
+              }
+            }
+          },
+          "description": "Section in the track details view."
+        },
+        "detail.section.album": {
+          "type": "array",
+          "maxItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "title"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:[a-z0-9.-]*[a-z0-9])?$",
+                "maxLength": 64
+              },
+              "title": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 60
+              },
+              "icon": {
+                "enum": [
+                  "plugin",
+                  "wishlist",
+                  "music",
+                  "album",
+                  "artist",
+                  "playlist",
+                  "folder",
+                  "tag",
+                  "search",
+                  "sparkle",
+                  "link",
+                  "upload",
+                  "download",
+                  "share",
+                  "chart",
+                  "clock",
+                  "star",
+                  "heart",
+                  "info",
+                  "settings"
+                ]
+              },
+              "command": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:[a-z0-9.-]*[a-z0-9])?$"
+              },
+              "workspace": {
+                "type": "string"
+              },
+              "view": {
+                "type": "string",
+                "pattern": "^#/[A-Za-z0-9/_-]{0,100}$"
+              }
+            }
+          },
+          "description": "Section in the album view."
+        },
+        "detail.section.artist": {
+          "type": "array",
+          "maxItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "title"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:[a-z0-9.-]*[a-z0-9])?$",
+                "maxLength": 64
+              },
+              "title": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 60
+              },
+              "icon": {
+                "enum": [
+                  "plugin",
+                  "wishlist",
+                  "music",
+                  "album",
+                  "artist",
+                  "playlist",
+                  "folder",
+                  "tag",
+                  "search",
+                  "sparkle",
+                  "link",
+                  "upload",
+                  "download",
+                  "share",
+                  "chart",
+                  "clock",
+                  "star",
+                  "heart",
+                  "info",
+                  "settings"
+                ]
+              },
+              "command": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:[a-z0-9.-]*[a-z0-9])?$"
+              },
+              "workspace": {
+                "type": "string"
+              },
+              "view": {
+                "type": "string",
+                "pattern": "^#/[A-Za-z0-9/_-]{0,100}$"
+              }
+            }
+          },
+          "description": "Section in the artist view."
+        },
+        "detail.section.playlist": {
+          "type": "array",
+          "maxItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "title"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:[a-z0-9.-]*[a-z0-9])?$",
+                "maxLength": 64
+              },
+              "title": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 60
+              },
+              "icon": {
+                "enum": [
+                  "plugin",
+                  "wishlist",
+                  "music",
+                  "album",
+                  "artist",
+                  "playlist",
+                  "folder",
+                  "tag",
+                  "search",
+                  "sparkle",
+                  "link",
+                  "upload",
+                  "download",
+                  "share",
+                  "chart",
+                  "clock",
+                  "star",
+                  "heart",
+                  "info",
+                  "settings"
+                ]
+              },
+              "command": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:[a-z0-9.-]*[a-z0-9])?$"
+              },
+              "workspace": {
+                "type": "string"
+              },
+              "view": {
+                "type": "string",
+                "pattern": "^#/[A-Za-z0-9/_-]{0,100}$"
+              }
+            }
+          },
+          "description": "Section in the playlist view."
+        },
+        "row.badge.track": {
+          "type": "array",
+          "maxItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "title"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:[a-z0-9.-]*[a-z0-9])?$",
+                "maxLength": 64
+              },
+              "title": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 60
+              },
+              "icon": {
+                "enum": [
+                  "plugin",
+                  "wishlist",
+                  "music",
+                  "album",
+                  "artist",
+                  "playlist",
+                  "folder",
+                  "tag",
+                  "search",
+                  "sparkle",
+                  "link",
+                  "upload",
+                  "download",
+                  "share",
+                  "chart",
+                  "clock",
+                  "star",
+                  "heart",
+                  "info",
+                  "settings"
+                ]
+              },
+              "command": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:[a-z0-9.-]*[a-z0-9])?$"
+              },
+              "workspace": {
+                "type": "string"
+              },
+              "view": {
+                "type": "string",
+                "pattern": "^#/[A-Za-z0-9/_-]{0,100}$"
+              }
+            }
+          },
+          "description": "Short text badge in track rows, computed by a worker command."
+        },
+        "settings.section": {
+          "type": "array",
+          "maxItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "title"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:[a-z0-9.-]*[a-z0-9])?$",
+                "maxLength": 64
+              },
+              "title": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 60
+              },
+              "icon": {
+                "enum": [
+                  "plugin",
+                  "wishlist",
+                  "music",
+                  "album",
+                  "artist",
+                  "playlist",
+                  "folder",
+                  "tag",
+                  "search",
+                  "sparkle",
+                  "link",
+                  "upload",
+                  "download",
+                  "share",
+                  "chart",
+                  "clock",
+                  "star",
+                  "heart",
+                  "info",
+                  "settings"
+                ]
+              },
+              "command": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:[a-z0-9.-]*[a-z0-9])?$"
+              },
+              "workspace": {
+                "type": "string"
+              },
+              "view": {
+                "type": "string",
+                "pattern": "^#/[A-Za-z0-9/_-]{0,100}$"
+              }
+            }
+          },
+          "description": "Settings form generated by Tape from manifest.settings."
+        },
+        "command": {
+          "type": "array",
+          "maxItems": 10,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "title"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:[a-z0-9.-]*[a-z0-9])?$",
+                "maxLength": 64
+              },
+              "title": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 60
+              },
+              "icon": {
+                "enum": [
+                  "plugin",
+                  "wishlist",
+                  "music",
+                  "album",
+                  "artist",
+                  "playlist",
+                  "folder",
+                  "tag",
+                  "search",
+                  "sparkle",
+                  "link",
+                  "upload",
+                  "download",
+                  "share",
+                  "chart",
+                  "clock",
+                  "star",
+                  "heart",
+                  "info",
+                  "settings"
+                ]
+              },
+              "command": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:[a-z0-9.-]*[a-z0-9])?$"
+              },
+              "workspace": {
+                "type": "string"
+              },
+              "view": {
+                "type": "string",
+                "pattern": "^#/[A-Za-z0-9/_-]{0,100}$"
+              }
+            }
+          },
+          "description": "Command in the command palette."
+        },
+        "player.panel": {
+          "type": "array",
+          "maxItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "title"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:[a-z0-9.-]*[a-z0-9])?$",
+                "maxLength": 64
+              },
+              "title": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 60
+              },
+              "icon": {
+                "enum": [
+                  "plugin",
+                  "wishlist",
+                  "music",
+                  "album",
+                  "artist",
+                  "playlist",
+                  "folder",
+                  "tag",
+                  "search",
+                  "sparkle",
+                  "link",
+                  "upload",
+                  "download",
+                  "share",
+                  "chart",
+                  "clock",
+                  "star",
+                  "heart",
+                  "info",
+                  "settings"
+                ]
+              },
+              "command": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:[a-z0-9.-]*[a-z0-9])?$"
+              },
+              "workspace": {
+                "type": "string"
+              },
+              "view": {
+                "type": "string",
+                "pattern": "^#/[A-Za-z0-9/_-]{0,100}$"
+              }
+            }
+          },
+          "description": "Panel next to the player, such as lyrics or notes."
+        },
+        "library.filters": {
+          "type": "array",
+          "maxItems": 2,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "title"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:[a-z0-9.-]*[a-z0-9])?$",
+                "maxLength": 64
+              },
+              "title": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 60
+              },
+              "icon": {
+                "enum": [
+                  "plugin",
+                  "wishlist",
+                  "music",
+                  "album",
+                  "artist",
+                  "playlist",
+                  "folder",
+                  "tag",
+                  "search",
+                  "sparkle",
+                  "link",
+                  "upload",
+                  "download",
+                  "share",
+                  "chart",
+                  "clock",
+                  "star",
+                  "heart",
+                  "info",
+                  "settings"
+                ]
+              },
+              "command": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:[a-z0-9.-]*[a-z0-9])?$"
+              },
+              "workspace": {
+                "type": "string"
+              },
+              "view": {
+                "type": "string",
+                "pattern": "^#/[A-Za-z0-9/_-]{0,100}$"
+              }
+            }
+          },
+          "description": "Library filter applied by Tape over track fields."
+        },
+        "player.controls": {
+          "type": "array",
+          "maxItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "title"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:[a-z0-9.-]*[a-z0-9])?$",
+                "maxLength": 64
+              },
+              "title": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 60
+              },
+              "icon": {
+                "enum": [
+                  "plugin",
+                  "wishlist",
+                  "music",
+                  "album",
+                  "artist",
+                  "playlist",
+                  "folder",
+                  "tag",
+                  "search",
+                  "sparkle",
+                  "link",
+                  "upload",
+                  "download",
+                  "share",
+                  "chart",
+                  "clock",
+                  "star",
+                  "heart",
+                  "info",
+                  "settings"
+                ]
+              },
+              "command": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:[a-z0-9.-]*[a-z0-9])?$"
+              },
+              "workspace": {
+                "type": "string"
+              },
+              "view": {
+                "type": "string",
+                "pattern": "^#/[A-Za-z0-9/_-]{0,100}$"
+              }
+            }
+          },
+          "description": "Compact control in the player bar."
+        },
+        "toolbar.library": {
+          "type": "array",
+          "maxItems": 2,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "title"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:[a-z0-9.-]*[a-z0-9])?$",
+                "maxLength": 64
+              },
+              "title": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 60
+              },
+              "icon": {
+                "enum": [
+                  "plugin",
+                  "wishlist",
+                  "music",
+                  "album",
+                  "artist",
+                  "playlist",
+                  "folder",
+                  "tag",
+                  "search",
+                  "sparkle",
+                  "link",
+                  "upload",
+                  "download",
+                  "share",
+                  "chart",
+                  "clock",
+                  "star",
+                  "heart",
+                  "info",
+                  "settings"
+                ]
+              },
+              "command": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:[a-z0-9.-]*[a-z0-9])?$"
+              },
+              "workspace": {
+                "type": "string"
+              },
+              "view": {
+                "type": "string",
+                "pattern": "^#/[A-Za-z0-9/_-]{0,100}$"
+              }
+            }
+          },
+          "description": "Action in the library header."
+        },
+        "statusbar.item": {
+          "type": "array",
+          "maxItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "title"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:[a-z0-9.-]*[a-z0-9])?$",
+                "maxLength": 64
+              },
+              "title": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 60
+              },
+              "icon": {
+                "enum": [
+                  "plugin",
+                  "wishlist",
+                  "music",
+                  "album",
+                  "artist",
+                  "playlist",
+                  "folder",
+                  "tag",
+                  "search",
+                  "sparkle",
+                  "link",
+                  "upload",
+                  "download",
+                  "share",
+                  "chart",
+                  "clock",
+                  "star",
+                  "heart",
+                  "info",
+                  "settings"
+                ]
+              },
+              "command": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:[a-z0-9.-]*[a-z0-9])?$"
+              },
+              "workspace": {
+                "type": "string"
+              },
+              "view": {
+                "type": "string",
+                "pattern": "^#/[A-Za-z0-9/_-]{0,100}$"
+              }
+            }
+          },
+          "description": "Item in the status bar."
+        },
+        "skin": {
+          "type": "array",
+          "maxItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "title"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:[a-z0-9.-]*[a-z0-9])?$",
+                "maxLength": 64
+              },
+              "title": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 60
+              },
+              "icon": {
+                "enum": [
+                  "plugin",
+                  "wishlist",
+                  "music",
+                  "album",
+                  "artist",
+                  "playlist",
+                  "folder",
+                  "tag",
+                  "search",
+                  "sparkle",
+                  "link",
+                  "upload",
+                  "download",
+                  "share",
+                  "chart",
+                  "clock",
+                  "star",
+                  "heart",
+                  "info",
+                  "settings"
+                ]
+              },
+              "command": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:[a-z0-9.-]*[a-z0-9])?$"
+              },
+              "workspace": {
+                "type": "string"
+              },
+              "view": {
+                "type": "string",
+                "pattern": "^#/[A-Za-z0-9/_-]{0,100}$"
+              }
+            }
+          },
+          "description": "Full replacement of the Desktop interface over the client core."
+        }
+      }
+    },
+    "settings": {
+      "type": "object",
+      "maxProperties": 30,
+      "additionalProperties": {
+        "type": "object",
+        "required": [
+          "type",
+          "title"
+        ],
+        "properties": {
+          "type": {
+            "enum": [
+              "string",
+              "number",
+              "boolean",
+              "select"
+            ]
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 60
+          },
+          "description": {
+            "type": "string"
+          },
+          "default": {},
+          "secret": {
+            "type": "boolean"
+          },
+          "maxLength": {
+            "type": "number"
+          },
+          "min": {
+            "type": "number"
+          },
+          "max": {
+            "type": "number"
+          },
+          "options": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -221,3 +221,6 @@ function deepFreeze<T>(value: T): T {
   }
   return value;
 }
+
+// ── Plugin API v2 ────────────────────────────────────────────
+export * from './v2/index.js';

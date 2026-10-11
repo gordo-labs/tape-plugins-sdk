@@ -84,4 +84,5 @@ export declare function definePluginManifest(manifest: PluginManifest): Readonly
 /** Check host/plugin compatibility using only public version strings. */
 export declare function validatePluginCompatibility(manifest: Pick<PluginManifest, 'compatibility'>, target: PluginCompatibilityTarget): string[];
 export declare function assertPluginCompatible(manifest: Pick<PluginManifest, 'compatibility'>, target: PluginCompatibilityTarget): void;
+export * from './v2/index.js';
 //# sourceMappingURL=index.d.ts.map

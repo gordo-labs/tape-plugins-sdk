@@ -66,3 +66,19 @@ npm run pack:check
 ## License
 
 MIT
+
+## Plugin API v2 (beta, `0.3.0-beta`)
+
+Plugin API v2 is the contract for public community plugins. It adds:
+
+- `validatePluginManifestV2` / `definePluginManifestV2` for `schemaVersion: 2` manifests (`kind`, `publisher`, `engines`, `network.allow`, `dataDisclosure`, `activation`, `contributes` by extension point, `settings`).
+- `PLUGIN_PERMISSION_CATALOG`: every permission with its consent text, risk and status (`available`, `reserved`, `core-only`).
+- `EXTENSION_POINT_CATALOG`: where a plugin can appear in Tape Desktop and how (declarative or sandboxed iframe).
+- `PLUGIN_HARD_LIMITS`: the limits Tape applies to every plugin.
+- `TapeWorkerApi`: the `tape` global available to a worker running in the Hub sandbox.
+- `migrateManifestV1ToV2` for existing v1 manifests.
+- Machine-readable files: `schemas/plugin-manifest.v2.schema.json` and `schemas/plugin-api.v2.json`
+  (`import schema from '@gordo-labs/tape-plugins-sdk/schemas/plugin-manifest.v2.schema.json'`).
+
+Reserved permissions and extension points are proposed APIs: Tape accepts them only in Developer mode
+(`validatePluginManifestV2(manifest, { allowReserved: true })`) and never in the public catalog.
