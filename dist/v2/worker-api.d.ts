@@ -96,8 +96,8 @@ export interface PluginPage<T> {
 }
 export interface PluginMetadataProposalInput {
     trackId: string;
-    /** Only these fields can be proposed in API v2. */
-    fields: Partial<Record<'title' | 'artist' | 'album' | 'albumArtist' | 'year' | 'genre' | 'label', string | number | null>>;
+    /** Fields Tape can apply with undo. `year` is a four-digit number; `genre` replaces the track's genre. */
+    fields: Partial<Record<'title' | 'artist' | 'album' | 'year' | 'genre', string | number | null>>;
     /** 0..1 */
     confidence: number;
     /** Short human-readable reasons or source links, at most 20. */
