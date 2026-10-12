@@ -1,6 +1,6 @@
 {
   "name": "@gordo-labs/tape-plugins-sdk",
-  "version": "0.3.0-beta.0",
+  "version": "0.3.0-beta.1",
   "description": "Manifest contract, permission and extension-point catalogs, and worker API types for Tape plugins.",
   "license": "MIT",
   "type": "module",

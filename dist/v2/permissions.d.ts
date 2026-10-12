@@ -20,13 +20,13 @@ export interface PluginPermissionDefinition {
 export declare const PLUGIN_PERMISSION_CATALOG: readonly [{
     readonly id: "library.read";
     readonly title: "Read your library";
-    readonly description: "Search and list tracks, albums, artists and playlists. File locations are never shared.";
+    readonly description: "Search and list tracks and playlists. File locations are never shared.";
     readonly risk: "low";
     readonly status: "available";
 }, {
     readonly id: "library.metadata.read";
     readonly title: "Read enriched metadata";
-    readonly description: "Read MusicBrainz and Discogs identifiers, labels, genres, BPM, key and analysis data.";
+    readonly description: "Read label, BPM, musical key, MusicBrainz identifiers, AcoustID and enrichment status.";
     readonly risk: "low";
     readonly status: "available";
 }, {
@@ -70,7 +70,7 @@ export declare const PLUGIN_PERMISSION_CATALOG: readonly [{
     readonly title: "Run background tasks";
     readonly description: "Run tasks in the background within the limits Tape sets. They pause while Tape is busy.";
     readonly risk: "medium";
-    readonly status: "available";
+    readonly status: "reserved";
 }, {
     readonly id: "ui.contribute";
     readonly title: "Add to the interface";
@@ -85,10 +85,10 @@ export declare const PLUGIN_PERMISSION_CATALOG: readonly [{
     readonly status: "available";
 }, {
     readonly id: "diagnostics.write";
-    readonly title: "Write diagnostic logs";
-    readonly description: "Write bounded logs to its own plugin console.";
+    readonly title: "Add to diagnostic reports";
+    readonly description: "Include its own log lines in the diagnostic reports you export. Logs in the plugin console need no permission.";
     readonly risk: "low";
-    readonly status: "available";
+    readonly status: "reserved";
 }, {
     readonly id: "metadata.apply";
     readonly title: "Apply approved metadata changes";

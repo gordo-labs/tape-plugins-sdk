@@ -208,7 +208,7 @@ export interface TapeWorkerApi {
         }): Promise<void>;
     };
     readonly log: {
-        /** `diagnostics.write` for info/warn/error; always allowed in Developer mode console. */
+        /** Lines for the plugin console. No permission needed; rate limited by the host. */
         info(message: string, data?: unknown): void;
         warn(message: string, data?: unknown): void;
         error(message: string, data?: unknown): void;

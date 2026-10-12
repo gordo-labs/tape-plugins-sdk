@@ -10,14 +10,14 @@ export const PLUGIN_PERMISSION_CATALOG = [
     {
         id: 'library.read',
         title: 'Read your library',
-        description: 'Search and list tracks, albums, artists and playlists. File locations are never shared.',
+        description: 'Search and list tracks and playlists. File locations are never shared.',
         risk: 'low',
         status: 'available',
     },
     {
         id: 'library.metadata.read',
         title: 'Read enriched metadata',
-        description: 'Read MusicBrainz and Discogs identifiers, labels, genres, BPM, key and analysis data.',
+        description: 'Read label, BPM, musical key, MusicBrainz identifiers, AcoustID and enrichment status.',
         risk: 'low',
         status: 'available',
     },
@@ -68,7 +68,7 @@ export const PLUGIN_PERMISSION_CATALOG = [
         title: 'Run background tasks',
         description: 'Run tasks in the background within the limits Tape sets. They pause while Tape is busy.',
         risk: 'medium',
-        status: 'available',
+        status: 'reserved',
     },
     {
         id: 'ui.contribute',
@@ -86,10 +86,10 @@ export const PLUGIN_PERMISSION_CATALOG = [
     },
     {
         id: 'diagnostics.write',
-        title: 'Write diagnostic logs',
-        description: 'Write bounded logs to its own plugin console.',
+        title: 'Add to diagnostic reports',
+        description: 'Include its own log lines in the diagnostic reports you export. Logs in the plugin console need no permission.',
         risk: 'low',
-        status: 'available',
+        status: 'reserved',
     },
     {
         id: 'metadata.apply',
