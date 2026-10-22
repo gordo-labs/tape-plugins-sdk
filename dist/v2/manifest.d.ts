@@ -96,6 +96,8 @@ export interface ValidateManifestV2Options {
      */
     allowReserved?: boolean;
 }
+/** Common multi-label public suffixes and shared-hosting suffixes. Not the whole Public Suffix List. Tape Desktop applies the same list. */
+export declare const NETWORK_PUBLIC_SUFFIXES: readonly string[];
 /** Validate a v2 manifest. Returns human-readable issues; empty means valid. */
 export declare function validatePluginManifestV2(manifest: unknown, options?: ValidateManifestV2Options): string[];
 export declare class PluginManifestV2ValidationError extends Error {

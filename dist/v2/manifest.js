@@ -15,6 +15,15 @@ const SETTING_KEY_PATTERN = /^[a-zA-Z][a-zA-Z0-9_]{0,39}$/;
 const SEMVER_PATTERN = /^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?(?:\+[0-9A-Za-z.-]+)?$/;
 const RANGE_PART = /^(>=|<=|>|<|=)?\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?(?:\+[0-9A-Za-z.-]+)?$/;
 const HOST_PATTERN = /^(\*\.)?(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,63}$/;
+/** Common multi-label public suffixes and shared-hosting suffixes. Not the whole Public Suffix List. Tape Desktop applies the same list. */
+export const NETWORK_PUBLIC_SUFFIXES = [
+    'co.uk', 'org.uk', 'ac.uk', 'gov.uk',
+    'com.au', 'net.au', 'org.au',
+    'co.jp', 'ne.jp',
+    'com.br', 'com.mx', 'co.nz', 'co.za', 'com.cn', 'com.tw', 'co.kr', 'co.in',
+    'github.io', 'herokuapp.com', 'vercel.app', 'netlify.app', 'pages.dev', 'workers.dev',
+    'cloudfront.net', 's3.amazonaws.com', 'blogspot.com', 'appspot.com', 'firebaseapp.com', 'web.app',
+];
 const PRIVATE_SUFFIXES = ['.local', '.lan', '.internal', '.home.arpa', '.localhost', '.test', '.invalid', '.example'];
 const KINDS = ['plugin', 'theme', 'module'];
 const TIERS = ['core', 'official', 'verified', 'community', 'local-dev'];
@@ -342,8 +351,12 @@ function isAllowedHost(value) {
     const host = value.toLowerCase();
     if (host !== value || !HOST_PATTERN.test(host))
         return false;
-    const bare = host.startsWith('*.') ? host.slice(2) : host;
+    const wildcard = host.startsWith('*.');
+    const bare = wildcard ? host.slice(2) : host;
     if (bare.split('.').length < 2)
+        return false;
+    // `*.<base>` covers every subdomain: refuse it when <base> is a registry or shared-hosting suffix, where it would reach unrelated sites.
+    if (wildcard && NETWORK_PUBLIC_SUFFIXES.includes(bare))
         return false;
     return !PRIVATE_SUFFIXES.some((suffix) => `.${bare}`.endsWith(suffix));
 }

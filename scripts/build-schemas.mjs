@@ -8,6 +8,7 @@ import {
   PLUGIN_EVENT_NAMES,
   PLUGIN_EVENT_PERMISSIONS,
   PLUGIN_HARD_LIMITS,
+  PLUGIN_HOST_GUARANTEES,
   PLUGIN_ICON_TOKENS,
   PLUGIN_MANIFEST_V2_JSON_SCHEMA,
   PLUGIN_PERMISSION_CATALOG,
@@ -27,5 +28,6 @@ write('plugin-api.v2.json', {
   events: PLUGIN_EVENT_NAMES.map((name) => ({ name, permission: PLUGIN_EVENT_PERMISSIONS[name] })),
   workerApi: Object.entries(WORKER_API_PERMISSIONS).map(([method, permission]) => ({ method, permission })),
   hardLimits: PLUGIN_HARD_LIMITS,
+  hostGuarantees: PLUGIN_HOST_GUARANTEES,
 });
 console.log(`schemas written to ${out}`);

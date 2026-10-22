@@ -3,6 +3,9 @@ import { readFileSync } from 'node:fs';
 import test from 'node:test';
 import {
   EXTENSION_POINT_CATALOG,
+  NETWORK_PUBLIC_SUFFIXES,
+  PLUGIN_HARD_LIMITS,
+  PLUGIN_HOST_GUARANTEES,
   PLUGIN_EVENT_NAMES,
   PLUGIN_EVENT_PERMISSIONS,
   PLUGIN_PERMISSION_CATALOG,
@@ -78,6 +81,37 @@ test('network access needs an allowlist of public domains and a data disclosure 
   const undisclosed = scrobbler();
   undisclosed.network.allow.push('api.example.org');
   assert.ok(validatePluginManifestV2(undisclosed).some((issue) => issue.includes('missing network domain api.example.org')));
+});
+
+test('network.allow wildcards over public or shared-hosting suffixes are refused; exact hosts and deeper wildcards are fine', () => {
+  const check = (host) => {
+    const manifest = scrobbler();
+    manifest.network.allow = [host];
+    manifest.dataDisclosure = [{ domain: host, data: 'x', purpose: 'y' }];
+    return validatePluginManifestV2(manifest);
+  };
+  for (const suffix of NETWORK_PUBLIC_SUFFIXES) {
+    assert.ok(check(`*.${suffix}`).some((issue) => issue.includes('not allowed')), `*.${suffix}`);
+    assert.deepEqual(check(`*.api.${suffix}`).filter((issue) => issue.includes('not allowed')), [], `*.api.${suffix}`);
+    assert.deepEqual(check(`example.${suffix}`).filter((issue) => issue.includes('not allowed')), [], `example.${suffix}`);
+  }
+  assert.ok(check('*.com').some((issue) => issue.includes('not allowed')));
+  assert.deepEqual(check('*.discogs.com'), []);
+  assert.ok(NETWORK_PUBLIC_SUFFIXES.includes('co.uk') && NETWORK_PUBLIC_SUFFIXES.includes('herokuapp.com') && NETWORK_PUBLIC_SUFFIXES.includes('s3.amazonaws.com'));
+});
+
+test('the published limits include the host-side protections', () => {
+  assert.deepEqual(
+    Object.fromEntries(['cpuBudgetMs', 'cpuWindowMs', 'rejectedReplyDelayMs', 'maxPendingRefusals', 'maxConcurrentPageCalls', 'maxPlaylists', 'maxPlaylistTrackIds', 'badgeCommandBudgetMs', 'notificationsPerMinute'].map((key) => [key, PLUGIN_HARD_LIMITS[key]])),
+    { cpuBudgetMs: 15_000, cpuWindowMs: 60_000, rejectedReplyDelayMs: 250, maxPendingRefusals: 1_000, maxConcurrentPageCalls: 4, maxPlaylists: 1_000, maxPlaylistTrackIds: 5_000, badgeCommandBudgetMs: 1_500, notificationsPerMinute: 6 },
+  );
+  // Existing keys keep their meaning.
+  assert.equal(PLUGIN_HARD_LIMITS.hostCallsPerMinute, 600);
+  assert.equal(PLUGIN_HARD_LIMITS.maxPageSize, 200);
+  assert.deepEqual(PLUGIN_HOST_GUARANTEES, { cursors: 'signed-per-process', notificationBudget: 'shared-by-worker-and-pages' });
+  const published = JSON.parse(readFileSync(new URL('../schemas/plugin-api.v2.json', import.meta.url), 'utf8'));
+  assert.equal(published.hardLimits.cpuBudgetMs, 15_000);
+  assert.equal(published.hostGuarantees.cursors, 'signed-per-process');
 });
 
 test('reserved permissions and extension points are proposed APIs, accepted only in Developer mode', () => {

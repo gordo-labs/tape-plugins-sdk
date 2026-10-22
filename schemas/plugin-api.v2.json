@@ -465,6 +465,18 @@
     "storageMaxValueBytes": 65536,
     "notificationsPerMinute": 6,
     "logLinesPerMinute": 120,
-    "failuresBeforeDisable": 3
+    "failuresBeforeDisable": 3,
+    "cpuBudgetMs": 15000,
+    "cpuWindowMs": 60000,
+    "rejectedReplyDelayMs": 250,
+    "maxPendingRefusals": 1000,
+    "maxConcurrentPageCalls": 4,
+    "maxPlaylists": 1000,
+    "maxPlaylistTrackIds": 5000,
+    "badgeCommandBudgetMs": 1500
+  },
+  "hostGuarantees": {
+    "cursors": "signed-per-process",
+    "notificationBudget": "shared-by-worker-and-pages"
   }
 }

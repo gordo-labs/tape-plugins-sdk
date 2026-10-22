@@ -74,7 +74,8 @@ Plugin API v2 is the contract for public community plugins. It adds:
 - `validatePluginManifestV2` / `definePluginManifestV2` for `schemaVersion: 2` manifests (`kind`, `publisher`, `engines`, `network.allow`, `dataDisclosure`, `activation`, `contributes` by extension point, `settings`).
 - `PLUGIN_PERMISSION_CATALOG`: every permission with its consent text, risk and status (`available`, `reserved`, `core-only`).
 - `EXTENSION_POINT_CATALOG`: where a plugin can appear in Tape Desktop and how (declarative or sandboxed iframe).
-- `PLUGIN_HARD_LIMITS`: the limits Tape applies to every plugin.
+- `PLUGIN_HARD_LIMITS`: the limits Tape applies to every plugin. Since `0.3.0-beta.5` it also lists the CPU budget (15 s per 60 s), the delay on refused calls (250 ms; more than 1000 waiting refusals stops the worker), 4 host calls in flight for plugin pages, `listPlaylists` (1000) and `getPlaylistTrackIds` (5000) caps, and the badge command budget (1.5 s). `PLUGIN_HOST_GUARANTEES` notes that paging cursors are signed and valid only until the Hub restarts, and that notifications (6 per minute) are shared by the worker and the plugin's pages.
+- `network.allow` wildcards (since `0.3.0-beta.5`): `*.<base>` is refused when `<base>` is a public or shared-hosting suffix such as `co.uk` or `herokuapp.com` (`NETWORK_PUBLIC_SUFFIXES`).
 - `TapeWorkerApi`: the `tape` global available to a worker running in the Hub sandbox.
 - `kind: "theme"` plugins (since `0.3.0-beta.4`): declare `entrypoints.theme` (a `.json` token theme listed in `files`) and the available `ui.theme` permission; no worker needed. A `kind: "plugin"` may also ship a theme with the same two fields.
 - `tape.library.getAlbum` / `getArtist` / `getLabel` (since `0.3.0-beta.3`, `library.read`): resolve the `albumId`, `artistId` and `labelId` that context-menu commands receive.
