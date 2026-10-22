@@ -20,7 +20,7 @@ export interface PluginPermissionDefinition {
 export declare const PLUGIN_PERMISSION_CATALOG: readonly [{
     readonly id: "library.read";
     readonly title: "Read your library";
-    readonly description: "Search and list tracks and playlists. File locations are never shared.";
+    readonly description: "Search and list tracks and playlists, and look up albums, artists and labels. File locations are never shared.";
     readonly risk: "low";
     readonly status: "available";
 }, {

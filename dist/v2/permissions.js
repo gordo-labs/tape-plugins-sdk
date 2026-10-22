@@ -10,7 +10,7 @@ export const PLUGIN_PERMISSION_CATALOG = [
     {
         id: 'library.read',
         title: 'Read your library',
-        description: 'Search and list tracks and playlists. File locations are never shared.',
+        description: 'Search and list tracks and playlists, and look up albums, artists and labels. File locations are never shared.',
         risk: 'low',
         status: 'available',
     },

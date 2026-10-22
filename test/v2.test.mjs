@@ -174,3 +174,15 @@ test('catalogs are consistent with each other and with the published JSON files'
   const api = JSON.parse(readFileSync(new URL('../schemas/plugin-api.v2.json', import.meta.url), 'utf8'));
   assert.equal(api.permissions.length, PLUGIN_PERMISSION_CATALOG.length);
 });
+
+test('entity lookups for command context ids are part of the worker API under library.read', () => {
+  for (const method of ['library.getAlbum', 'library.getArtist', 'library.getLabel']) {
+    assert.equal(WORKER_API_PERMISSIONS[method], 'library.read', method);
+  }
+  const api = JSON.parse(readFileSync(new URL('../schemas/plugin-api.v2.json', import.meta.url), 'utf8'));
+  assert.deepEqual(
+    api.workerApi.map((entry) => entry.method),
+    Object.keys(WORKER_API_PERMISSIONS),
+  );
+  assert.ok(api.workerApi.some((entry) => entry.method === 'library.getLabel' && entry.permission === 'library.read'));
+});

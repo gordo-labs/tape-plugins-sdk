@@ -107,6 +107,36 @@ export interface PluginPlaylist {
   duration: number;
 }
 
+export interface PluginAlbum {
+  /** The `albumId` Tape passes to commands. */
+  id: string;
+  title: string;
+  /** Album artist, or the track artist when the album has none. */
+  artist: string;
+  year?: number;
+  /** Label as written in the tracks' tags, when any track has one. */
+  label?: string;
+  trackCount: number;
+  /** Track ids in disc and track order, at most 500. */
+  trackIds: string[];
+}
+
+export interface PluginArtist {
+  /** The `artistId` Tape passes to commands. */
+  id: string;
+  name: string;
+  albumCount: number;
+  trackCount: number;
+}
+
+export interface PluginLabel {
+  /** The `labelId` Tape passes to commands. */
+  id: string;
+  name: string;
+  albumCount: number;
+  trackCount: number;
+}
+
 export interface PluginPage<T> {
   items: T[];
   /** Pass to the next call to continue; `null` when there is nothing more. */
@@ -152,6 +182,12 @@ export interface TapeWorkerApi {
     getTracks(trackIds: string[]): Promise<PluginTrack[]>;
     /** `library.read`. Paginated listing; `query` searches title, artist and album. */
     listTracks(options?: { query?: string; limit?: number; cursor?: string | null }): Promise<PluginPage<PluginTrack>>;
+    /** `library.read`. Resolves an `albumId` from a command context; `null` when it does not exist. May answer `Busy` while Tape scans. */
+    getAlbum(albumId: string): Promise<PluginAlbum | null>;
+    /** `library.read`. Resolves an `artistId` from a command context; `null` when it does not exist. */
+    getArtist(artistId: string): Promise<PluginArtist | null>;
+    /** `library.read`. Resolves a `labelId` from a command context; `null` when it does not exist. */
+    getLabel(labelId: string): Promise<PluginLabel | null>;
     /** `library.read` */
     listPlaylists(): Promise<PluginPlaylist[]>;
     /** `library.read`. Track ids in order. */
@@ -234,6 +270,9 @@ export const WORKER_API_PERMISSIONS = {
   'library.getTrack': 'library.read',
   'library.getTracks': 'library.read',
   'library.listTracks': 'library.read',
+  'library.getAlbum': 'library.read',
+  'library.getArtist': 'library.read',
+  'library.getLabel': 'library.read',
   'library.listPlaylists': 'library.read',
   'library.getPlaylistTrackIds': 'library.read',
   'library.listFolders': 'library.folders.read',
