@@ -76,6 +76,7 @@ Plugin API v2 is the contract for public community plugins. It adds:
 - `EXTENSION_POINT_CATALOG`: where a plugin can appear in Tape Desktop and how (declarative or sandboxed iframe).
 - `PLUGIN_HARD_LIMITS`: the limits Tape applies to every plugin.
 - `TapeWorkerApi`: the `tape` global available to a worker running in the Hub sandbox.
+- `kind: "theme"` plugins (since `0.3.0-beta.4`): declare `entrypoints.theme` (a `.json` token theme listed in `files`) and the available `ui.theme` permission; no worker needed. A `kind: "plugin"` may also ship a theme with the same two fields.
 - `tape.library.getAlbum` / `getArtist` / `getLabel` (since `0.3.0-beta.3`, `library.read`): resolve the `albumId`, `artistId` and `labelId` that context-menu commands receive.
 - `migrateManifestV1ToV2` for existing v1 manifests.
 - Machine-readable files: `schemas/plugin-manifest.v2.schema.json` and `schemas/plugin-api.v2.json`

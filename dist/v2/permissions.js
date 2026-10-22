@@ -128,10 +128,10 @@ export const PLUGIN_PERMISSION_CATALOG = [
     },
     {
         id: 'ui.theme',
-        title: 'Change how Tape looks',
-        description: 'Replace colors, typography and spacing with a theme.',
+        title: 'Add a theme',
+        description: "Adds a color theme you can choose in Settings \u2192 Appearance. It can't read your library or run code.",
         risk: 'low',
-        status: 'reserved',
+        status: 'available',
     },
     {
         id: 'network.connect',

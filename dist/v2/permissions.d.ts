@@ -121,10 +121,10 @@ export declare const PLUGIN_PERMISSION_CATALOG: readonly [{
     readonly status: "reserved";
 }, {
     readonly id: "ui.theme";
-    readonly title: "Change how Tape looks";
-    readonly description: "Replace colors, typography and spacing with a theme.";
+    readonly title: "Add a theme";
+    readonly description: "Adds a color theme you can choose in Settings → Appearance. It can't read your library or run code.";
     readonly risk: "low";
-    readonly status: "reserved";
+    readonly status: "available";
 }, {
     readonly id: "network.connect";
     readonly title: "Open network connections";

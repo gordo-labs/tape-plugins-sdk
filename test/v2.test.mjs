@@ -137,6 +137,47 @@ test('themes and modules are gated by kind', () => {
   assert.ok(validatePluginManifestV2(module).some((issue) => issue.includes('reserved for core')));
 });
 
+const themePlugin = () => {
+  const { network, dataDisclosure, activation, settings, contributes, ...base } = scrobbler();
+  return { ...base, id: 'midnight-theme', kind: 'theme', permissions: ['ui.theme'], entrypoints: { theme: 'theme.json' } };
+};
+
+test('ui.theme is available with consent text', () => {
+  const permission = PLUGIN_PERMISSION_CATALOG.find((entry) => entry.id === 'ui.theme');
+  assert.equal(permission.status, 'available');
+  assert.equal(permission.risk, 'low');
+  assert.equal(permission.title, 'Add a theme');
+  assert.equal(permission.description, "Adds a color theme you can choose in Settings \u2192 Appearance. It can't read your library or run code.");
+});
+
+test('a theme plugin needs only entrypoints.theme and ui.theme', () => {
+  assert.deepEqual(validatePluginManifestV2(themePlugin()), []);
+  const noPermission = themePlugin();
+  noPermission.permissions = [];
+  assert.ok(validatePluginManifestV2(noPermission).some((issue) => issue.includes('ui.theme')));
+  const notJson = themePlugin();
+  notJson.entrypoints = { theme: 'theme.css' };
+  assert.ok(validatePluginManifestV2(notJson).some((issue) => issue.includes('.json')));
+  const traversal = themePlugin();
+  traversal.entrypoints = { theme: '../theme.json' };
+  assert.ok(validatePluginManifestV2(traversal).some((issue) => issue.includes('relative path')));
+});
+
+test('a plugin may also ship a theme', () => {
+  const manifest = scrobbler();
+  manifest.permissions = [...manifest.permissions, 'ui.theme'];
+  manifest.entrypoints = { ...manifest.entrypoints, theme: 'themes/dark.json' };
+  assert.deepEqual(validatePluginManifestV2(manifest), []);
+  manifest.permissions = manifest.permissions.filter((id) => id !== 'ui.theme');
+  assert.ok(validatePluginManifestV2(manifest).some((issue) => issue.includes('ui.theme')));
+  const core = scrobbler();
+  core.kind = 'module';
+  core.tier = 'core';
+  core.permissions = ['ui.theme'];
+  core.entrypoints = { theme: 'theme.json' };
+  assert.ok(validatePluginManifestV2(core).some((issue) => issue.includes('kind "module"')));
+});
+
 test('engines must include Plugin API 2', () => {
   const manifest = scrobbler();
   manifest.engines.pluginApi = '1';

@@ -137,11 +137,14 @@ export function validatePluginManifestV2(manifest: unknown, options: ValidateMan
     issues.push('manifest.entrypoints must declare a worker, ui or theme');
   }
 
-  if (manifest.kind === 'theme') {
-    if (!entrypoints?.theme) issues.push('a theme requires entrypoints.theme');
-    if (!permissions.has('ui.theme')) issues.push('a theme requires the ui.theme permission');
-  } else if (entrypoints?.theme) {
-    issues.push('entrypoints.theme is only allowed for kind "theme"');
+  if (manifest.kind === 'theme' && !entrypoints?.theme) issues.push('a theme requires entrypoints.theme');
+  if (manifest.kind === 'theme' && !permissions.has('ui.theme')) issues.push('a theme requires the ui.theme permission');
+  if (entrypoints?.theme !== undefined) {
+    if (manifest.kind === 'module') issues.push('entrypoints.theme is not allowed for kind "module"');
+    if (isBundlePath(entrypoints.theme) && !str(entrypoints.theme).toLowerCase().endsWith('.json')) {
+      issues.push('manifest.entrypoints.theme must be a .json file');
+    }
+    if (manifest.kind !== 'theme' && !permissions.has('ui.theme')) issues.push('entrypoints.theme requires the ui.theme permission');
   }
 
   validateSettings(manifest.settings, issues);
