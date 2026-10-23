@@ -77,6 +77,8 @@ export const WORKER_API_PERMISSIONS = {
     'storage.delete': 'storage.private',
     'storage.keys': 'storage.private',
     'settings.get': null,
+    /** Top-level `tape.wait`; needs no permission. */
+    'wait': null,
     'notifications.show': 'notifications.show',
 };
 /** Permission required to subscribe to each event. */

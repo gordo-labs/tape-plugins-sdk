@@ -89,6 +89,10 @@ export const PLUGIN_HARD_LIMITS = {
     changesRetentionDays: 90,
     /** Most entries of the Changes history kept per plugin. */
     changesMaxEntries: 5_000,
+    /** `tape.wait`: longest single wait. */
+    waitMaxMs: 10_000,
+    /** `tape.wait`: total milliseconds one plugin may spend waiting per rolling minute. */
+    waitTotalMsPerMinute: 30_000,
 };
 /**
  * Behavior of the host that is not a number but that plugins can rely on.

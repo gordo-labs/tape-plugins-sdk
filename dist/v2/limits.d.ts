@@ -88,6 +88,10 @@ export declare const PLUGIN_HARD_LIMITS: {
     readonly changesRetentionDays: 90;
     /** Most entries of the Changes history kept per plugin. */
     readonly changesMaxEntries: 5000;
+    /** `tape.wait`: longest single wait. */
+    readonly waitMaxMs: 10000;
+    /** `tape.wait`: total milliseconds one plugin may spend waiting per rolling minute. */
+    readonly waitTotalMsPerMinute: 30000;
 };
 /**
  * Behavior of the host that is not a number but that plugins can rely on.

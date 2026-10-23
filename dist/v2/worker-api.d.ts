@@ -420,6 +420,14 @@ export interface TapeWorkerApi {
         warn(message: string, data?: unknown): void;
         error(message: string, data?: unknown): void;
     };
+    /**
+     * Pause this handler for `ms` milliseconds (0..`PLUGIN_HARD_LIMITS.waitMaxMs`) without using CPU.
+     * No permission needed. The host keeps the timer, so the wait does not count against the CPU budget;
+     * it does count against the handler and job wall-time limits. Rejects with `InvalidArgument` for a
+     * non-number or out-of-range value, and with `RateLimited` once the plugin has waited
+     * `waitTotalMsPerMinute` in the last minute. Use it to pace requests instead of spinning.
+     */
+    wait(ms: number): Promise<void>;
     readonly lifecycle: {
         /** First install. Set up your own storage. */
         onInstall(handler: () => void | Promise<void>): void;
@@ -477,6 +485,8 @@ export declare const WORKER_API_PERMISSIONS: {
     readonly 'storage.delete': "storage.private";
     readonly 'storage.keys': "storage.private";
     readonly 'settings.get': null;
+    /** Top-level `tape.wait`; needs no permission. */
+    readonly wait: null;
     readonly 'notifications.show': "notifications.show";
 };
 export type WorkerApiMethod = keyof typeof WORKER_API_PERMISSIONS;

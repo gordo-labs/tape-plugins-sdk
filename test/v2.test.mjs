@@ -440,3 +440,12 @@ test('view trees reject unknown node types, props and non-JSON data', () => {
   cyclic.children.push(cyclic);
   assert.ok(validatePluginViewTree(cyclic).some((issue) => issue.includes('JSON')));
 });
+
+test('tape.wait is an ungated worker method with published limits', () => {
+  assert.equal(WORKER_API_PERMISSIONS.wait, null);
+  assert.equal(PLUGIN_HARD_LIMITS.waitMaxMs, 10_000);
+  assert.equal(PLUGIN_HARD_LIMITS.waitTotalMsPerMinute, 30_000);
+  const api = JSON.parse(readFileSync(new URL('../schemas/plugin-api.v2.json', import.meta.url), 'utf8'));
+  assert.ok(api.workerApi.some((entry) => entry.method === 'wait' && entry.permission === null));
+  assert.equal(api.hardLimits.waitMaxMs, 10_000);
+});

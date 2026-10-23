@@ -586,6 +586,10 @@
       "permission": null
     },
     {
+      "method": "wait",
+      "permission": null
+    },
+    {
       "method": "notifications.show",
       "permission": "notifications.show"
     }
@@ -631,7 +635,9 @@
     "viewMaxTableRows": 500,
     "mobileCallsPerMinute": 300,
     "changesRetentionDays": 90,
-    "changesMaxEntries": 5000
+    "changesMaxEntries": 5000,
+    "waitMaxMs": 10000,
+    "waitTotalMsPerMinute": 30000
   },
   "hostGuarantees": {
     "cursors": "signed-per-process",

@@ -86,7 +86,7 @@ Plugin API v2 is the contract for public community plugins. It adds:
 Reserved permissions and extension points are proposed APIs: Tape accepts them only in Developer mode
 (`validatePluginManifestV2(manifest, { allowReserved: true })`) and never in the public catalog.
 
-## Plugin API 2.1 (`0.4.0-beta.0`)
+## Plugin API 2.1 (`0.4.0-beta.1`)
 
 API 2.1 is an additive minor revision of Plugin API 2 (`PLUGIN_API_REVISION = "2.1"`); manifests still declare `engines.pluginApi: "2"` and v2 plugins keep working. Tape does the work and the plugin asks: a plugin never touches disk, database, audio or network directly. Granting a write permission is the user's standing approval; every change returns `{ changeId }`, appears in the plugin's Changes history and can be undone, and revoking the permission stops new changes at once.
 
@@ -99,3 +99,5 @@ Declarative views: a `workspace` item may set `"render": "<commandId>"` instead 
 Mobile: declarative workspaces appear on the paired phone when `ui.mobile` is granted. Iframe workspace items may add `"mobile": true`, only when `ui.mobile` is requested.
 
 New `PLUGIN_HARD_LIMITS`: `fileReadMaxBytes` (1 MB), `fileWriteMaxBytes` (8 MB), `fileWriteCallsPerMinute` (60), `fileWriteBytesPerDay` (1 GB), `maxFileListEntries` (1000), `jobMinIntervalMinutes` (15), `jobMaxRunMs` (5 min), `playbackCallsPerMinute` (30), `audioEffectChangesPerSecond` (10), `viewRendersPerMinute` (60), `viewMaxBytes`, `viewMaxDepth`, `viewMaxNodes`, `viewMaxTableRows`, `mobileCallsPerMinute` (300), `changesRetentionDays` (90) and `changesMaxEntries` (5000).
+
+`tape.wait(ms)` (since `0.4.0-beta.1`, no permission): the host pauses the handler for `ms` (0 to `waitMaxMs` = 10,000) without using the CPU budget, so workers can pace requests without spinning. Each plugin may wait at most `waitTotalMsPerMinute` (30,000) per rolling minute (`RateLimited` beyond that); invalid values reject with `InvalidArgument`. Waits still count toward handler and job wall-time limits.
