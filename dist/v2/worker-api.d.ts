@@ -165,6 +165,17 @@ export type FileRef = {
 export interface ChangeResult {
     changeId: string;
 }
+/** Returned by `organize.apply` and `organize.applyPlan`: one journal entry per move, one run id per call. */
+export interface OrganizeResult extends ChangeResult {
+    /** The first change of the run (`changeIds[0]`). */
+    changeId: string;
+    /** Groups every move of this call; the user can undo the whole run from Changes. */
+    runId: string;
+    /** One change id per file that was moved. */
+    changeIds: string[];
+    /** Files moved. */
+    moved: number;
+}
 export interface PluginFileStat {
     kind: 'file' | 'directory';
     size: number;
@@ -224,6 +235,8 @@ export interface PluginEffectsInput {
 /** What a command registered for a declarative view (`render`) receives and returns. See `views.ts`. */
 export interface PluginViewCommandContext {
     viewId?: string;
+    /** Where the view is drawn: the Desktop app or a paired phone. Set when the command runs for a view (render or action); absent for other invocations. */
+    surface?: 'desktop' | 'mobile';
     /** The state the plugin returned last time (or `{}`). */
     state?: unknown;
     /** Arguments of the `button` or `form` that triggered an action. */
@@ -302,12 +315,12 @@ export interface TapeWorkerApi {
         proposePlan(plan: PluginOrganizePlanInput): Promise<{
             planId: string;
         }>;
-        /** `library.organize.apply`. Applies a plan this plugin proposed. */
-        applyPlan(planId: string): Promise<ChangeResult>;
+        /** `library.organize.apply`. Applies a plan this plugin proposed (at most 120 moves, see `PLUGIN_HARD_LIMITS.organizeMaxMoves`). If a move fails, earlier moves are put back; when a file cannot be put back it stays moved and the error says so. */
+        applyPlan(planId: string): Promise<OrganizeResult>;
         /** `library.organize.apply`. Renames and moves tracks right away. Tape updates the library and keeps an undo journal. */
         apply(input: {
             moves: PluginOrganizePlanInput['moves'];
-        }): Promise<ChangeResult>;
+        }): Promise<OrganizeResult>;
     };
     readonly playlists: {
         /** `playlists.write` */

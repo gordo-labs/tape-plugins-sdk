@@ -15,6 +15,7 @@ import {
   migrateManifestV1ToV2,
   PLUGIN_API_REVISION,
   PLUGIN_VIEW_LIMITS,
+  COMMAND_PATTERN,
   getPluginPermission,
   validatePluginManifestV2,
   validatePluginViewTree,
@@ -448,4 +449,29 @@ test('tape.wait is an ungated worker method with published limits', () => {
   const api = JSON.parse(readFileSync(new URL('../schemas/plugin-api.v2.json', import.meta.url), 'utf8'));
   assert.ok(api.workerApi.some((entry) => entry.method === 'wait' && entry.permission === null));
   assert.equal(api.hardLimits.waitMaxMs, 10_000);
+});
+
+test('limits enforced by the Hub are published', () => {
+  assert.equal(PLUGIN_HARD_LIMITS.vaultMaxBytes, 2 * 1024 ** 3);
+  assert.equal(PLUGIN_HARD_LIMITS.minFreeDiskBytes, 1024 ** 3);
+  assert.equal(PLUGIN_HARD_LIMITS.changesPerMinute, 120);
+  assert.equal(PLUGIN_HARD_LIMITS.organizeMaxMoves, 500);
+  assert.equal(PLUGIN_HARD_LIMITS.jobRunsPerPluginPerCycle, 2);
+  assert.equal(PLUGIN_HARD_LIMITS.jobHourlyRunBudgetMs, 600_000);
+  assert.equal(PLUGIN_HARD_LIMITS.playbackToggleCooldownMs, 3_000);
+  assert.equal(PLUGIN_HARD_LIMITS.effectsMaxTotalBoostDb, 12);
+  assert.equal(PLUGIN_HARD_LIMITS.effectsLimiterThresholdDb, -1);
+  assert.equal(PLUGIN_HARD_LIMITS.effectsMaxRiseDbPerSecond, 6);
+  assert.equal(PLUGIN_HARD_LIMITS.viewStateMaxBytes, 64 * 1024);
+  assert.equal(PLUGIN_HARD_LIMITS.viewArgsMaxBytes, 16 * 1024);
+  assert.equal(PLUGIN_HARD_LIMITS.viewToastMaxChars, 200);
+});
+
+test('COMMAND_PATTERN is the one command id pattern: dotted ids pass, bad ones do not', () => {
+  for (const id of ['plan', 'apply-plan', 'row.badge.bpm', 'a1', 'v2.0-x']) assert.ok(COMMAND_PATTERN.test(id), id);
+  for (const id of ['', 'Plan', '.a', 'a.', '-a', 'a b', 'a_b']) assert.ok(!COMMAND_PATTERN.test(id), id);
+  const tree = { type: 'form', fields: [{ name: 'q', label: 'Q', type: 'text' }], submit: { command: 'row.badge.x', confirm: 'Sure?' } };
+  assert.deepEqual(validatePluginViewTree(tree), []);
+  assert.ok(validatePluginViewTree({ ...tree, submit: { command: 'Bad' } }).length > 0);
+  assert.ok(validatePluginViewTree({ ...tree, submit: { command: 'ok', confirm: '' } }).length > 0);
 });

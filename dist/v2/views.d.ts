@@ -98,7 +98,8 @@ export type PluginViewNode = {
     submit: {
         label?: string;
         command: string;
-        args?: Record<string, unknown>;
+        args?: Record<string, unknown>; /** When set, Tape asks the user to confirm with this text before submitting. */
+        confirm?: string;
     };
 } | {
     type: 'empty';
@@ -131,6 +132,8 @@ export declare const PLUGIN_VIEW_LIMITS: {
     readonly maxNodes: 2000;
     readonly maxTableRows: 500;
 };
+/** A command id in a view: lowercase letters and digits, with `.` and `-` inside (at most 64 characters). The Hub checks actions with the same pattern. */
+export declare const COMMAND_PATTERN: RegExp;
 /**
  * Validate a declarative view tree. Returns human-readable issues; empty means
  * valid. Enforces size, depth and node limits, allowed node types and props,

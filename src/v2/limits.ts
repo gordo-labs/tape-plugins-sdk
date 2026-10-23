@@ -94,6 +94,42 @@ export const PLUGIN_HARD_LIMITS = {
   waitMaxMs: 10_000,
   /** `tape.wait`: total milliseconds one plugin may spend waiting per rolling minute. */
   waitTotalMsPerMinute: 30_000,
+
+  // Enforced by the Hub (Plugin API 2.1 actions, routines, playback, effects and views)
+  /** Trash plus overwrite backups one plugin may hold. When full, `trash` and overwrites fail with `QuotaExceeded`. */
+  vaultMaxBytes: 2 * 1024 * 1024 * 1024,
+  /** Free space a volume must keep after a write or backup. */
+  minFreeDiskBytes: 1024 * 1024 * 1024,
+  /** Journaled changes (a file write, one organize move, a playlist or metadata change) per plugin per rolling minute. */
+  changesPerMinute: 120,
+  /** Most moves in one plan (`organize.proposePlan`). `organize.apply` and `applyPlan` take at most `min(organizeMaxMoves, changesPerMinute)` (120) moves per call, so split bigger plans. */
+  organizeMaxMoves: 500,
+  /** Routine runs one plugin gets per scheduler cycle. */
+  jobRunsPerPluginPerCycle: 2,
+  /** Total routine run time one plugin may use per rolling hour. */
+  jobHourlyRunBudgetMs: 10 * 60 * 1_000,
+  /** Shortest time between two play/pause/resume calls of one plugin. */
+  playbackToggleCooldownMs: 3_000,
+  /** Most track ids one playback call (`play`, `enqueue`) carries. */
+  maxPlaybackTracks: 500,
+  /** `tape.audio.setEffects`: total positive boost (output gain plus every positive EQ band) in dB. Larger sums are scaled down together. */
+  effectsMaxTotalBoostDb: 12,
+  /** The final limiter that is always last in the effects chain, in dBFS. */
+  effectsLimiterThresholdDb: -1,
+  /** The host never raises a gain faster than this (dB per second). */
+  effectsMaxRiseDbPerSecond: 6,
+  /** Compressor threshold bounds in dB. Values outside are clamped. */
+  effectsCompressorThresholdDbMin: -40,
+  effectsCompressorThresholdDbMax: 0,
+  /** Compressor ratio bounds. Values outside are clamped. */
+  effectsCompressorRatioMin: 1,
+  effectsCompressorRatioMax: 8,
+  /** Largest serialized view state the host keeps and passes back. */
+  viewStateMaxBytes: 64 * 1024,
+  /** Largest serialized `args` of one view action. */
+  viewArgsMaxBytes: 16 * 1024,
+  /** Longest toast a view command may return (characters; longer ones are cut). */
+  viewToastMaxChars: 200,
 } as const;
 
 /**

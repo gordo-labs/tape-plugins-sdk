@@ -540,6 +540,11 @@
             "args": {
               "type": "object",
               "description": "JSON passed to the command as `args`. No URLs."
+            },
+            "confirm": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 280
             }
           }
         }

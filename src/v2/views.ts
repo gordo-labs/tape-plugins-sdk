@@ -53,7 +53,7 @@ export type PluginViewNode =
   | { type: 'list'; items: PluginViewListItem[] }
   | { type: 'table'; columns: Array<{ key: string; title: string }>; rows: Array<Record<string, string | number | boolean | null>> }
   | ({ type: 'button' } & PluginViewAction)
-  | { type: 'form'; fields: PluginViewFormField[]; submit: { label?: string; command: string; args?: Record<string, unknown> } }
+  | { type: 'form'; fields: PluginViewFormField[]; submit: { label?: string; command: string; args?: Record<string, unknown>; /** When set, Tape asks the user to confirm with this text before submitting. */ confirm?: string } }
   | { type: 'empty'; title: string; message?: string }
   | { type: 'progress'; label?: string; /** 0..1. Omit for an indeterminate bar. */ value?: number };
 
@@ -86,7 +86,8 @@ export const PLUGIN_VIEW_LIMITS = {
 const TONES = ['default', 'muted', 'success', 'warning', 'danger'];
 const GAPS = ['none', 'sm', 'md', 'lg'];
 const BUTTON_TONES = ['default', 'primary', 'danger'];
-const COMMAND_PATTERN = /^[a-z0-9]+(?:[a-z0-9.-]*[a-z0-9])?$/;
+/** A command id in a view: lowercase letters and digits, with `.` and `-` inside (at most 64 characters). The Hub checks actions with the same pattern. */
+export const COMMAND_PATTERN = /^[a-z0-9]+(?:[a-z0-9.-]*[a-z0-9])?$/;
 const SLUG_KEY = /^[A-Za-z][A-Za-z0-9_]{0,39}$/;
 const URL_LIKE = /(?:^|[^a-z0-9+.-])[a-z][a-z0-9+.-]*:\/\/|^\s*(?:data|javascript|blob|file|vbscript):/i;
 const TEXT_MAX = 2_000;
@@ -352,10 +353,11 @@ function form(value: Record<string, unknown>, path: string, state: WalkState): v
   }
   const submit = value.submit;
   if (!isRecord(submit)) return add(state, `${path}.submit must be { command }`);
-  unknownKeys(submit, ['label', 'command', 'args'], `${path}.submit`, state);
+  unknownKeys(submit, ['label', 'command', 'args', 'confirm'], `${path}.submit`, state);
   if (submit.label !== undefined) text(submit.label, `${path}.submit.label`, 60, state);
   command(submit.command, `${path}.submit.command`, state);
   args(submit.args, `${path}.submit.args`, state);
+  if (submit.confirm !== undefined) text(submit.confirm, `${path}.submit.confirm`, 280, state);
 }
 
 function imageRef(value: Record<string, unknown>, path: string, state: WalkState, only?: string[]): void {
@@ -539,7 +541,7 @@ export const PLUGIN_VIEW_V1_JSON_SCHEMA = {
           type: 'object',
           additionalProperties: false,
           required: ['command'],
-          properties: { label: { type: 'string', minLength: 1, maxLength: 60 }, command: command_, args: argsSchema },
+          properties: { label: { type: 'string', minLength: 1, maxLength: 60 }, command: command_, args: argsSchema, confirm: { type: 'string', minLength: 1, maxLength: 280 } },
         },
       },
       ['fields', 'submit'],

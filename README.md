@@ -101,3 +101,11 @@ Mobile: declarative workspaces appear on the paired phone when `ui.mobile` is gr
 New `PLUGIN_HARD_LIMITS`: `fileReadMaxBytes` (1 MB), `fileWriteMaxBytes` (8 MB), `fileWriteCallsPerMinute` (60), `fileWriteBytesPerDay` (1 GB), `maxFileListEntries` (1000), `jobMinIntervalMinutes` (15), `jobMaxRunMs` (5 min), `playbackCallsPerMinute` (30), `audioEffectChangesPerSecond` (10), `viewRendersPerMinute` (60), `viewMaxBytes`, `viewMaxDepth`, `viewMaxNodes`, `viewMaxTableRows`, `mobileCallsPerMinute` (300), `changesRetentionDays` (90) and `changesMaxEntries` (5000).
 
 `tape.wait(ms)` (since `0.4.0-beta.1`, no permission): the host pauses the handler for `ms` (0 to `waitMaxMs` = 10,000) without using the CPU budget, so workers can pace requests without spinning. Each plugin may wait at most `waitTotalMsPerMinute` (30,000) per rolling minute (`RateLimited` beyond that); invalid values reject with `InvalidArgument`. Waits still count toward handler and job wall-time limits.
+
+### `0.4.0-beta.2`
+
+- `organize.apply` and `organize.applyPlan` resolve to `OrganizeResult` (`{ changeId, runId, changeIds, moved }`). One call moves at most `min(organizeMaxMoves, changesPerMinute)` = 120 files; split bigger plans.
+- `PluginViewCommandContext.surface` (`'desktop' | 'mobile'`) tells a view command where it is drawn.
+- A `form` `submit` may set `confirm` (like `button.confirm`): the app asks first, and the host refuses an unconfirmed submit with `ConfirmationRequired`.
+- `COMMAND_PATTERN` is exported: the host checks view action command ids with the same pattern (lowercase letters and digits, `.` and `-` inside, at most 64 characters).
+- `PLUGIN_HARD_LIMITS` now also publishes `vaultMaxBytes`, `minFreeDiskBytes`, `changesPerMinute`, `organizeMaxMoves`, `jobRunsPerPluginPerCycle`, `jobHourlyRunBudgetMs`, `playbackToggleCooldownMs`, `maxPlaybackTracks`, `effectsMaxTotalBoostDb`, `effectsLimiterThresholdDb`, `effectsMaxRiseDbPerSecond`, `effectsCompressorThresholdDbMin/Max`, `effectsCompressorRatioMin/Max`, `viewStateMaxBytes`, `viewArgsMaxBytes` and `viewToastMaxChars`. The Desktop host reads these values from here.
