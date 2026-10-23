@@ -54,6 +54,42 @@ export const PLUGIN_HARD_LIMITS = {
   maxPlaylistTrackIds: 5_000,
   /** Longest a badge command (`row.badge.*`) may take to answer before the host skips it. */
   badgeCommandBudgetMs: 1_500,
+
+  // Plugin API 2.1
+  /** `library.files.read`: largest slice one `tape.files.read` returns (before base64). */
+  fileReadMaxBytes: 1024 * 1024,
+  /** `library.files.write`: largest file one `tape.files.write` accepts (decoded). */
+  fileWriteMaxBytes: 8 * 1024 * 1024,
+  /** Write-type file calls (write, move, trash) per plugin per minute. */
+  fileWriteCallsPerMinute: 60,
+  /** Bytes a plugin may write per day (rolling 24 h). */
+  fileWriteBytesPerDay: 1024 * 1024 * 1024,
+  /** Entries `tape.files.list` returns for one directory. */
+  maxFileListEntries: 1_000,
+  /** Shortest interval a routine registered with `tape.jobs.register` may ask for. */
+  jobMinIntervalMinutes: 15,
+  /** Wall time of one routine run (one command invocation). */
+  jobMaxRunMs: 5 * 60 * 1_000,
+  /** `playback.control` calls per plugin per minute. */
+  playbackCallsPerMinute: 30,
+  /** `tape.audio.setEffects` changes per second. */
+  audioEffectChangesPerSecond: 10,
+  /** Renders of declarative views per plugin per minute. */
+  viewRendersPerMinute: 60,
+  /** Largest serialized declarative view tree. */
+  viewMaxBytes: 256 * 1024,
+  /** Deepest nesting of a declarative view tree (the root is depth 1). */
+  viewMaxDepth: 12,
+  /** Most nodes in a declarative view tree (list items and table rows count as one node each). */
+  viewMaxNodes: 2_000,
+  /** Most rows in a declarative `table`. */
+  viewMaxTableRows: 500,
+  /** Calls per plugin per minute from paired phones, across all devices. */
+  mobileCallsPerMinute: 300,
+  /** Days the host keeps entries of the plugin Changes history. */
+  changesRetentionDays: 90,
+  /** Most entries of the Changes history kept per plugin. */
+  changesMaxEntries: 5_000,
 } as const;
 
 /**

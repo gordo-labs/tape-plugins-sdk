@@ -67,7 +67,7 @@ npm run pack:check
 
 MIT
 
-## Plugin API v2 (beta, `0.3.0-beta`)
+## Plugin API v2 (beta, `0.3.0-beta`; 2.1 below)
 
 Plugin API v2 is the contract for public community plugins. It adds:
 
@@ -85,3 +85,17 @@ Plugin API v2 is the contract for public community plugins. It adds:
 
 Reserved permissions and extension points are proposed APIs: Tape accepts them only in Developer mode
 (`validatePluginManifestV2(manifest, { allowReserved: true })`) and never in the public catalog.
+
+## Plugin API 2.1 (`0.4.0-beta.0`)
+
+API 2.1 is an additive minor revision of Plugin API 2 (`PLUGIN_API_REVISION = "2.1"`); manifests still declare `engines.pluginApi: "2"` and v2 plugins keep working. Tape does the work and the plugin asks: a plugin never touches disk, database, audio or network directly. Granting a write permission is the user's standing approval; every change returns `{ changeId }`, appears in the plugin's Changes history and can be undone, and revoking the permission stops new changes at once.
+
+New `available` permissions: `library.files.read`, `library.files.write`, `library.organize.apply`, `metadata.apply`, `playlists.write` (own playlists only), `jobs.schedule`, `playback.control`, `audio.analyze`, `ui.mobile`, and `audio.process`. `audio.process` is `available` with the new catalog field `developerOnly: true`: it works only in Developer mode, so a manifest requesting it needs `allowReserved: true` until the audio graph passes playback QA. `status` keeps its meaning.
+
+New worker API (`TapeWorkerApi`): `files.{stat,read,write,move,trash,list}` with `FileRef` (`{ trackId }`, `{ folderIndex, relativePath }`, or `{ scope: 'plugin', relativePath }` for the plugin's own folder), `organize.applyPlan` / `organize.apply`, `metadata.apply`, `playlists.{create,update,setTracks,addTracks,removeTracks,delete}`, `jobs.register(id, { everyMinutes >= 15 }, handler)` (register synchronously at load), `playback.{play,pause,resume,next,previous,seek,setVolume,enqueue}` (reject with `Unavailable` when no Desktop UI owns playback), `audio.setEffects`, and `views.update`. Each method's permission is in `WORKER_API_PERMISSIONS`.
+
+Declarative views: a `workspace` item may set `"render": "<commandId>"` instead of an iframe `view` (at most one of the two). Tape calls the command with `{ viewId, state }` (actions add `args`) and draws the returned `PluginViewResult` (`{ view?, state?, toast?, navigate? }`) with its own components. Node types: `stack`, `section`, `text`, `heading`, `badge`, `image` (`trackId` or `albumId` only), `list`, `table`, `button`, `form`, `empty`, `progress`. `validatePluginViewTree(tree)` returns issues and enforces 256 KB, depth 12, 2,000 nodes, 500 table rows, allowed types and props, and no URLs in any string. Schema: `schemas/plugin-view.v1.schema.json`. A declarative workspace needs no `entrypoints.ui`.
+
+Mobile: declarative workspaces appear on the paired phone when `ui.mobile` is granted. Iframe workspace items may add `"mobile": true`, only when `ui.mobile` is requested.
+
+New `PLUGIN_HARD_LIMITS`: `fileReadMaxBytes` (1 MB), `fileWriteMaxBytes` (8 MB), `fileWriteCallsPerMinute` (60), `fileWriteBytesPerDay` (1 GB), `maxFileListEntries` (1000), `jobMinIntervalMinutes` (15), `jobMaxRunMs` (5 min), `playbackCallsPerMinute` (30), `audioEffectChangesPerSecond` (10), `viewRendersPerMinute` (60), `viewMaxBytes`, `viewMaxDepth`, `viewMaxNodes`, `viewMaxTableRows`, `mobileCallsPerMinute` (300), `changesRetentionDays` (90) and `changesMaxEntries` (5000).

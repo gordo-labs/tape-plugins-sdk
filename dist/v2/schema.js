@@ -11,6 +11,8 @@ const item = {
         command: { type: 'string', pattern: '^[a-z0-9]+(?:[a-z0-9.-]*[a-z0-9])?$' },
         workspace: { type: 'string' },
         view: { type: 'string', pattern: '^#/[A-Za-z0-9/_-]{0,100}$' },
+        render: { type: 'string', pattern: '^[a-z0-9]+(?:[a-z0-9.-]*[a-z0-9])?$', maxLength: 64, description: 'Workspace items: worker command returning a declarative view tree (see plugin-view.v1.schema.json). Exclusive with view.' },
+        mobile: { type: 'boolean', description: 'Iframe workspace items: also show on the paired phone. Requires ui.mobile.' },
     },
 };
 /**

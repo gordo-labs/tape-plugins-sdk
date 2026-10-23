@@ -6,4 +6,5 @@ export * from './worker-api.js';
 export * from './manifest.js';
 export * from './migrate.js';
 export * from './schema.js';
+export * from './views.js';
 //# sourceMappingURL=index.d.ts.map

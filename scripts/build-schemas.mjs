@@ -12,6 +12,9 @@ import {
   PLUGIN_ICON_TOKENS,
   PLUGIN_MANIFEST_V2_JSON_SCHEMA,
   PLUGIN_PERMISSION_CATALOG,
+  PLUGIN_VIEW_LIMITS,
+  PLUGIN_VIEW_NODE_TYPES,
+  PLUGIN_VIEW_V1_JSON_SCHEMA,
   WORKER_API_PERMISSIONS,
 } from '../dist/index.js';
 
@@ -20,6 +23,7 @@ mkdirSync(out, { recursive: true });
 const write = (name, value) => writeFileSync(join(out, name), `${JSON.stringify(value, null, 2)}\n`);
 
 write('plugin-manifest.v2.schema.json', PLUGIN_MANIFEST_V2_JSON_SCHEMA);
+write('plugin-view.v1.schema.json', PLUGIN_VIEW_V1_JSON_SCHEMA);
 write('plugin-api.v2.json', {
   policy: PLUGIN_API_POLICY,
   permissions: PLUGIN_PERMISSION_CATALOG,
@@ -29,5 +33,6 @@ write('plugin-api.v2.json', {
   workerApi: Object.entries(WORKER_API_PERMISSIONS).map(([method, permission]) => ({ method, permission })),
   hardLimits: PLUGIN_HARD_LIMITS,
   hostGuarantees: PLUGIN_HOST_GUARANTEES,
+  views: { nodeTypes: PLUGIN_VIEW_NODE_TYPES, limits: PLUGIN_VIEW_LIMITS },
 });
 console.log(`schemas written to ${out}`);

@@ -172,6 +172,81 @@ export interface PluginFetchResponse {
   text: string;
 }
 
+/** Reference to a file Tape manages (Plugin API 2.1). Paths are library-relative, `/`-separated, with no `..`, no absolute paths and no symlink traversal; Tape refuses anything that resolves outside the folder. */
+export type FileRef =
+  | { trackId: string }
+  | { folderIndex: number; relativePath: string }
+  /** The plugin's own `<data>/plugins/<id>/files/` folder. */
+  | { scope: 'plugin'; relativePath: string };
+
+/** Returned by every call that changes something. The change appears in the plugin's Changes history, where the user can undo it. */
+export interface ChangeResult {
+  changeId: string;
+}
+
+export interface PluginFileStat {
+  kind: 'file' | 'directory';
+  size: number;
+  /** ISO 8601, or null when unknown. */
+  modifiedAt: string | null;
+}
+
+export interface PluginFileEntry extends PluginFileStat {
+  name: string;
+}
+
+export interface PluginFileReadResult {
+  /** The slice, base64 encoded. */
+  base64: string;
+  offset: number;
+  /** Bytes in this slice (before base64). */
+  length: number;
+  /** True when the slice reaches the end of the file. */
+  eof: boolean;
+}
+
+export interface PluginMetadataApplyInput {
+  trackId: string;
+  /** Same fields as a proposal; `year` is a four-digit number and `genre` replaces the track's genre. */
+  fields: PluginMetadataProposalInput['fields'];
+}
+
+export interface PluginPlaylistCreateInput {
+  name: string;
+  description?: string;
+  trackIds?: string[];
+}
+
+/** Handed to a routine run. A run is one command invocation of at most `jobMaxRunMs`. */
+export interface PluginJobContext {
+  jobId: string;
+  /** Groups the changes of this run in the Changes history ("Undo all from this run"). */
+  runId: string;
+  /** ISO 8601 time the run started. */
+  startedAt: string;
+  /** True when the user started it with "Run now". */
+  manual: boolean;
+}
+
+export interface PluginEffectsInput {
+  /** Parametric bands: `freq` in Hz, `gain` in dB, `q` quality factor. */
+  eq?: Array<{ freq: number; gain: number; q: number }>;
+  /** Overall gain in dB. */
+  gain?: number;
+  compressor?: { thresholdDb: number; ratio: number; attackMs: number; releaseMs: number };
+  /** Headphone crossfeed amount, 0..1. */
+  crossfeed?: number;
+}
+
+/** What a command registered for a declarative view (`render`) receives and returns. See `views.ts`. */
+export interface PluginViewCommandContext {
+  viewId?: string;
+  /** The state the plugin returned last time (or `{}`). */
+  state?: unknown;
+  /** Arguments of the `button` or `form` that triggered an action. */
+  args?: Record<string, unknown>;
+}
+
 export interface TapeWorkerApi {
   readonly plugin: { readonly id: string; readonly version: string };
 
@@ -196,19 +271,89 @@ export interface TapeWorkerApi {
     listFolders(): Promise<Array<{ index: number; name: string }>>;
   };
 
+  readonly files: {
+    /** `library.files.read` */
+    stat(ref: FileRef): Promise<PluginFileStat>;
+    /** `library.files.read`. At most 1 MB per call. */
+    read(ref: FileRef, options?: { offset?: number; length?: number }): Promise<PluginFileReadResult>;
+    /** `library.files.write`. At most 8 MB (decoded). Creates parent folders inside the library folder. Refuses to replace an existing file unless `overwrite` is true. */
+    write(ref: FileRef, base64: string, options?: { overwrite?: boolean }): Promise<ChangeResult>;
+    /** `library.files.write`. Updates the library index. */
+    move(ref: FileRef, to: PluginFileLocation | { scope: 'plugin'; relativePath: string }): Promise<ChangeResult>;
+    /** `library.files.write`. Sends the file to Tape's trash, from where it can be restored. */
+    trash(ref: FileRef): Promise<ChangeResult>;
+    /** `library.files.read`. One directory, at most 1000 entries. */
+    list(location: PluginFileLocation | { scope: 'plugin'; relativePath: string }): Promise<{ entries: PluginFileEntry[]; truncated: boolean }>;
+  };
+
   readonly metadata: {
     /** `metadata.propose`. The user reviews the proposal; nothing changes until they accept. */
     propose(input: PluginMetadataProposalInput): Promise<{ proposalId: string }>;
+    /** `metadata.apply`. Changes the track now, through the metadata ledger; the change can be undone. */
+    apply(input: PluginMetadataApplyInput): Promise<ChangeResult>;
   };
 
   readonly organize: {
-    /** `library.organize.propose`. Shows the plan to the user. The plugin cannot apply it. */
+    /** `library.organize.propose`. Shows the plan to the user. */
     proposePlan(plan: PluginOrganizePlanInput): Promise<{ planId: string }>;
+    /** `library.organize.apply`. Applies a plan this plugin proposed. */
+    applyPlan(planId: string): Promise<ChangeResult>;
+    /** `library.organize.apply`. Renames and moves tracks right away. Tape updates the library and keeps an undo journal. */
+    apply(input: { moves: PluginOrganizePlanInput['moves'] }): Promise<ChangeResult>;
+  };
+
+  readonly playlists: {
+    /** `playlists.write` */
+    create(input: PluginPlaylistCreateInput): Promise<ChangeResult & { playlistId: string }>;
+    /** `playlists.write`. Only playlists this plugin created. */
+    update(playlistId: string, fields: { name?: string; description?: string }): Promise<ChangeResult>;
+    /** `playlists.write`. Only playlists this plugin created. */
+    setTracks(playlistId: string, trackIds: string[]): Promise<ChangeResult>;
+    /** `playlists.write`. Only playlists this plugin created. */
+    addTracks(playlistId: string, trackIds: string[]): Promise<ChangeResult>;
+    /** `playlists.write`. Only playlists this plugin created. */
+    removeTracks(playlistId: string, trackIds: string[]): Promise<ChangeResult>;
+    /** `playlists.write`. Only playlists this plugin created. */
+    delete(playlistId: string): Promise<ChangeResult>;
+  };
+
+  readonly jobs: {
+    /**
+     * `jobs.schedule`. Register a routine; call it synchronously while the worker loads, like `commands.register`.
+     * `everyMinutes` is at least 15. Runs are skipped while Tape is busy and last at most 5 minutes.
+     */
+    register(id: string, schedule: { everyMinutes: number }, handler: (context: PluginJobContext) => void | Promise<void>): void;
   };
 
   readonly playback: {
     /** `playback.read` */
     getState(): Promise<{ trackId: string | null }>;
+    /** `playback.control`. Rejects with `Unavailable` when no Tape Desktop window owns playback. */
+    play(input: ({ trackIds: string[] } | { playlistId: string }) & { startIndex?: number }): Promise<void>;
+    /** `playback.control` */
+    pause(): Promise<void>;
+    /** `playback.control` */
+    resume(): Promise<void>;
+    /** `playback.control` */
+    next(): Promise<void>;
+    /** `playback.control` */
+    previous(): Promise<void>;
+    /** `playback.control`. Position in seconds. */
+    seek(seconds: number): Promise<void>;
+    /** `playback.control`. 0..1 */
+    setVolume(volume: number): Promise<void>;
+    /** `playback.control`. Adds to the end of the queue. */
+    enqueue(trackIds: string[]): Promise<void>;
+  };
+
+  readonly audio: {
+    /** `audio.process` (Developer mode). Sets parameters of Tape's built-in effects; omitted effects keep their value. */
+    setEffects(effects: PluginEffectsInput): Promise<void>;
+  };
+
+  readonly views: {
+    /** `ui.contribute`. Asks every host showing the declarative view to render it again. */
+    update(viewId: string): Promise<void>;
   };
 
   readonly events: {
@@ -222,7 +367,7 @@ export interface TapeWorkerApi {
      * The host passes the entity id(s) of where it was invoked from, and for
      * `row.badge.track` expects `{ text }` (at most 12 characters) or `null`.
      */
-    register(commandId: string, handler: (context: { trackId?: string; albumId?: string; artistId?: string; labelId?: string; playlistId?: string; folderIndex?: number; trackIds?: string[] }) => unknown): void;
+    register(commandId: string, handler: (context: PluginViewCommandContext & { trackId?: string; albumId?: string; artistId?: string; labelId?: string; playlistId?: string; folderIndex?: number; trackIds?: string[] }) => unknown): void;
   };
 
   readonly net: {
@@ -276,9 +421,35 @@ export const WORKER_API_PERMISSIONS = {
   'library.listPlaylists': 'library.read',
   'library.getPlaylistTrackIds': 'library.read',
   'library.listFolders': 'library.folders.read',
+  'files.stat': 'library.files.read',
+  'files.read': 'library.files.read',
+  'files.list': 'library.files.read',
+  'files.write': 'library.files.write',
+  'files.move': 'library.files.write',
+  'files.trash': 'library.files.write',
   'metadata.propose': 'metadata.propose',
+  'metadata.apply': 'metadata.apply',
   'organize.proposePlan': 'library.organize.propose',
+  'organize.applyPlan': 'library.organize.apply',
+  'organize.apply': 'library.organize.apply',
+  'playlists.create': 'playlists.write',
+  'playlists.update': 'playlists.write',
+  'playlists.setTracks': 'playlists.write',
+  'playlists.addTracks': 'playlists.write',
+  'playlists.removeTracks': 'playlists.write',
+  'playlists.delete': 'playlists.write',
+  'jobs.register': 'jobs.schedule',
   'playback.getState': 'playback.read',
+  'playback.play': 'playback.control',
+  'playback.pause': 'playback.control',
+  'playback.resume': 'playback.control',
+  'playback.next': 'playback.control',
+  'playback.previous': 'playback.control',
+  'playback.seek': 'playback.control',
+  'playback.setVolume': 'playback.control',
+  'playback.enqueue': 'playback.control',
+  'audio.setEffects': 'audio.process',
+  'views.update': 'ui.contribute',
   'net.fetch': 'network.fetch',
   'storage.get': 'storage.private',
   'storage.set': 'storage.private',

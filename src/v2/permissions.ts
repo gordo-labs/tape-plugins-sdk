@@ -18,6 +18,13 @@ export interface PluginPermissionDefinition {
   description: string;
   risk: PluginPermissionRisk;
   status: PluginPermissionStatus;
+  /**
+   * Plugin API 2.1. An `available` permission with `developerOnly: true` is part of the contract and works,
+   * but the host only grants it while Developer mode is on (it is still being qualified). A manifest that
+   * requests it is rejected unless `allowReserved` is set, exactly like a `reserved` one. Absent means false.
+   * It is a separate field so `status` keeps meaning "shipped in the contract".
+   */
+  developerOnly?: boolean;
 }
 
 export const PLUGIN_PERMISSION_CATALOG = [
@@ -78,13 +85,6 @@ export const PLUGIN_PERMISSION_CATALOG = [
     status: 'available',
   },
   {
-    id: 'jobs.schedule',
-    title: 'Run background tasks',
-    description: 'Run tasks in the background within the limits Tape sets. They pause while Tape is busy.',
-    risk: 'medium',
-    status: 'reserved',
-  },
-  {
     id: 'ui.contribute',
     title: 'Add to the interface',
     description: 'Add menu items, panels, views and settings in the places listed in the manifest.',
@@ -106,20 +106,6 @@ export const PLUGIN_PERMISSION_CATALOG = [
     status: 'reserved',
   },
   {
-    id: 'metadata.apply',
-    title: 'Apply approved metadata changes',
-    description: 'Apply a batch of metadata changes you approved, with undo.',
-    risk: 'medium',
-    status: 'reserved',
-  },
-  {
-    id: 'library.organize.apply',
-    title: 'Apply an approved file plan',
-    description: 'Ask Tape to rename or move files according to a plan you approved, with undo.',
-    risk: 'high',
-    status: 'reserved',
-  },
-  {
     id: 'tags.write.propose',
     title: 'Suggest tag writes',
     description: 'Suggest writing tags into audio files. You review every change.',
@@ -127,18 +113,75 @@ export const PLUGIN_PERMISSION_CATALOG = [
     status: 'reserved',
   },
   {
+    id: 'library.files.read',
+    title: 'Read your music files',
+    description: 'Read the contents and details of files only inside your library folders, up to 1 MB per call. It cannot change anything.',
+    risk: 'high',
+    status: 'available',
+  },
+  {
+    id: 'library.files.write',
+    title: 'Change your music files',
+    description: "Create, overwrite, rename and move files only inside your library folders and its own plugin folder; deletions go to Tape's trash and every change can be undone.",
+    risk: 'high',
+    status: 'available',
+  },
+  {
+    id: 'library.organize.apply',
+    title: 'Rename and move your music',
+    description: 'Rename and move tracks by applying organize plans, only inside your library folders; Tape updates your library and every change can be undone.',
+    risk: 'high',
+    status: 'available',
+  },
+  {
+    id: 'metadata.apply',
+    title: 'Change track details',
+    description: 'Change title, artist, album, year and genre of your tracks directly; every change is recorded and can be undone.',
+    risk: 'medium',
+    status: 'available',
+  },
+  {
     id: 'playlists.write',
     title: 'Create and edit playlists',
-    description: 'Create playlists and add tracks to playlists it created.',
+    description: 'Create playlists, and edit or delete only the playlists it created; your other playlists are never touched and every change can be undone.',
     risk: 'medium',
-    status: 'reserved',
+    status: 'available',
+  },
+  {
+    id: 'jobs.schedule',
+    title: 'Run on a schedule',
+    description: 'Run routines in the background at most every 15 minutes, for up to 5 minutes each; they pause while Tape is busy and you can pause them any time.',
+    risk: 'medium',
+    status: 'available',
   },
   {
     id: 'playback.control',
     title: 'Control playback',
-    description: 'Play, pause, skip and queue tracks.',
+    description: 'Play tracks and playlists, pause, resume, skip, seek, change the volume and add to the queue, at a limited rate.',
     risk: 'medium',
-    status: 'reserved',
+    status: 'available',
+  },
+  {
+    id: 'audio.analyze',
+    title: 'See what is playing as sound',
+    description: "Receive a live spectrum and level reading of what plays, only on the plugin's own pages. It cannot hear or record the audio.",
+    risk: 'low',
+    status: 'available',
+  },
+  {
+    id: 'audio.process',
+    title: 'Change how music sounds',
+    description: "Adjust Tape's built-in effects (equalizer, gain, compressor, crossfeed). It cannot run its own audio code. Developer mode only for now.",
+    risk: 'high',
+    status: 'available',
+    developerOnly: true,
+  },
+  {
+    id: 'ui.mobile',
+    title: 'Show on your phone',
+    description: "Show its views in your paired Tape app and run its commands from there, with the same permissions it has on this computer.",
+    risk: 'medium',
+    status: 'available',
   },
   {
     id: 'ui.theme',

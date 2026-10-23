@@ -54,6 +54,40 @@ export declare const PLUGIN_HARD_LIMITS: {
     readonly maxPlaylistTrackIds: 5000;
     /** Longest a badge command (`row.badge.*`) may take to answer before the host skips it. */
     readonly badgeCommandBudgetMs: 1500;
+    /** `library.files.read`: largest slice one `tape.files.read` returns (before base64). */
+    readonly fileReadMaxBytes: number;
+    /** `library.files.write`: largest file one `tape.files.write` accepts (decoded). */
+    readonly fileWriteMaxBytes: number;
+    /** Write-type file calls (write, move, trash) per plugin per minute. */
+    readonly fileWriteCallsPerMinute: 60;
+    /** Bytes a plugin may write per day (rolling 24 h). */
+    readonly fileWriteBytesPerDay: number;
+    /** Entries `tape.files.list` returns for one directory. */
+    readonly maxFileListEntries: 1000;
+    /** Shortest interval a routine registered with `tape.jobs.register` may ask for. */
+    readonly jobMinIntervalMinutes: 15;
+    /** Wall time of one routine run (one command invocation). */
+    readonly jobMaxRunMs: number;
+    /** `playback.control` calls per plugin per minute. */
+    readonly playbackCallsPerMinute: 30;
+    /** `tape.audio.setEffects` changes per second. */
+    readonly audioEffectChangesPerSecond: 10;
+    /** Renders of declarative views per plugin per minute. */
+    readonly viewRendersPerMinute: 60;
+    /** Largest serialized declarative view tree. */
+    readonly viewMaxBytes: number;
+    /** Deepest nesting of a declarative view tree (the root is depth 1). */
+    readonly viewMaxDepth: 12;
+    /** Most nodes in a declarative view tree (list items and table rows count as one node each). */
+    readonly viewMaxNodes: 2000;
+    /** Most rows in a declarative `table`. */
+    readonly viewMaxTableRows: 500;
+    /** Calls per plugin per minute from paired phones, across all devices. */
+    readonly mobileCallsPerMinute: 300;
+    /** Days the host keeps entries of the plugin Changes history. */
+    readonly changesRetentionDays: 90;
+    /** Most entries of the Changes history kept per plugin. */
+    readonly changesMaxEntries: 5000;
 };
 /**
  * Behavior of the host that is not a number but that plugins can rely on.

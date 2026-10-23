@@ -14,6 +14,14 @@ export interface PluginContributionItemV2 {
     workspace?: string;
     /** Hash route inside `entrypoints.ui`, e.g. `#/lyrics` (iframe points). */
     view?: string;
+    /**
+     * Workspace items only (Plugin API 2.1): worker command that returns the declarative view tree
+     * (`PluginViewResult`) instead of an iframe `view`. Tape draws it on Desktop, and on mobile when
+     * `ui.mobile` is granted. At most one of `view` and `render`.
+     */
+    render?: string;
+    /** Iframe workspace items only (Plugin API 2.1): also show this view in the paired phone app. Requires `ui.mobile`. */
+    mobile?: boolean;
 }
 export type PluginContributionsV2 = Partial<Record<ExtensionPointId, PluginContributionItemV2[]>>;
 export type PluginSettingDefinition = {

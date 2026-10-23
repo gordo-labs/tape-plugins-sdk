@@ -92,7 +92,7 @@ export declare const PLUGIN_MANIFEST_V2_JSON_SCHEMA: {
             readonly uniqueItems: true;
             readonly maxItems: 24;
             readonly items: {
-                readonly enum: ("library.read" | "library.metadata.read" | "library.folders.read" | "metadata.propose" | "library.organize.propose" | "playback.read" | "network.fetch" | "storage.private" | "jobs.schedule" | "ui.contribute" | "notifications.show" | "diagnostics.write" | "metadata.apply" | "library.organize.apply" | "tags.write.propose" | "playlists.write" | "playback.control" | "ui.theme" | "network.connect" | "network.iroh:music-hub-network" | "storage.addon:music-hub-network")[];
+                readonly enum: ("library.read" | "library.metadata.read" | "library.folders.read" | "metadata.propose" | "library.organize.propose" | "playback.read" | "network.fetch" | "storage.private" | "ui.contribute" | "notifications.show" | "diagnostics.write" | "tags.write.propose" | "library.files.read" | "library.files.write" | "library.organize.apply" | "metadata.apply" | "playlists.write" | "jobs.schedule" | "playback.control" | "audio.analyze" | "audio.process" | "ui.mobile" | "ui.theme" | "network.connect" | "network.iroh:music-hub-network" | "storage.addon:music-hub-network")[];
             };
         };
         readonly network: {
@@ -157,7 +157,7 @@ export declare const PLUGIN_MANIFEST_V2_JSON_SCHEMA: {
             readonly properties: {
                 [k: string]: {
                     type: string;
-                    maxItems: 2 | 1 | 3 | 10;
+                    maxItems: 1 | 2 | 3 | 10;
                     items: {
                         readonly type: "object";
                         readonly additionalProperties: false;
@@ -186,6 +186,16 @@ export declare const PLUGIN_MANIFEST_V2_JSON_SCHEMA: {
                             readonly view: {
                                 readonly type: "string";
                                 readonly pattern: "^#/[A-Za-z0-9/_-]{0,100}$";
+                            };
+                            readonly render: {
+                                readonly type: "string";
+                                readonly pattern: "^[a-z0-9]+(?:[a-z0-9.-]*[a-z0-9])?$";
+                                readonly maxLength: 64;
+                                readonly description: "Workspace items: worker command returning a declarative view tree (see plugin-view.v1.schema.json). Exclusive with view.";
+                            };
+                            readonly mobile: {
+                                readonly type: "boolean";
+                                readonly description: "Iframe workspace items: also show on the paired phone. Requires ui.mobile.";
                             };
                         };
                     };

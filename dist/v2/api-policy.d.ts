@@ -13,9 +13,17 @@
  *   disables the plugin with a clear message instead of failing at runtime.
  */
 export declare const PLUGIN_API_VERSION_V2: "2";
+/**
+ * Revision inside the major version. `2.1` adds writes, routines, playback control, effects, declarative views
+ * and mobile. Plugins keep declaring `engines.pluginApi: "2"`; the revision is informational and only grows.
+ */
+export declare const PLUGIN_API_REVISION: "2.1";
+/** The minor part of `PLUGIN_API_REVISION`. */
+export declare const PLUGIN_API_MINOR: 1;
 export declare const SUPPORTED_PLUGIN_API_VERSIONS: readonly ["1", "2"];
 export declare const PLUGIN_API_POLICY: {
     readonly currentVersion: "2";
+    readonly currentRevision: "2.1";
     readonly supportedVersions: readonly ["1", "2"];
     readonly additiveWithinMajor: true;
     readonly proposedApisRequireDeveloperMode: true;

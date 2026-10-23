@@ -147,6 +147,8 @@ function validatePermissions(value, thirdParty, options, issues) {
             issues.push(`permission ${id} is reserved for core add-ons`);
         if (definition.status === 'reserved' && !options.allowReserved)
             issues.push(`permission ${id} is not available yet (proposed API, Developer mode only)`);
+        if (definition.developerOnly && !options.allowReserved)
+            issues.push(`permission ${id} is available in Developer mode only`);
         granted.add(id);
     }
     return granted;
@@ -292,7 +294,9 @@ function validateContributions(manifest, permissions, entrypoints, options, issu
         }
         if (items.length > point.maxItemsPerPlugin)
             issues.push(`contributes.${pointId} accepts at most ${point.maxItemsPerPlugin} items`);
-        if (point.form === 'iframe' && !entrypoints?.ui)
+        // A workspace made only of declarative (`render`) items needs no HTML entrypoint.
+        const needsUi = point.form === 'iframe' && !(pointId === 'workspace' && items.length > 0 && items.every((entry) => isRecord(entry) && entry.render !== undefined));
+        if (needsUi && !entrypoints?.ui)
             issues.push(`contributes.${pointId} requires entrypoints.ui`);
         for (const item of items) {
             if (!isRecord(item)) {
@@ -308,6 +312,26 @@ function validateContributions(manifest, permissions, entrypoints, options, issu
             boundedText(item.title, `${label}.title`, MAX.title, issues);
             if (item.icon !== undefined && !icons.includes(str(item.icon)))
                 issues.push(`${label}: unknown icon token ${str(item.icon)}`);
+            if (item.render !== undefined || item.mobile !== undefined) {
+                if (pointId !== 'workspace')
+                    issues.push(`${label}: render and mobile are only for workspace items`);
+            }
+            if (item.mobile !== undefined && typeof item.mobile !== 'boolean')
+                issues.push(`${label}: mobile must be a boolean`);
+            if (pointId === 'workspace') {
+                if (item.render !== undefined && item.view !== undefined)
+                    issues.push(`${label}: set at most one of view and render`);
+                if (item.render !== undefined) {
+                    if (!ITEM_ID_PATTERN.test(str(item.render)) || str(item.render).length > 64)
+                        issues.push(`${label}: render must be a command id (lowercase slug)`);
+                    if (!entrypoints?.worker)
+                        issues.push(`${label}: render requires entrypoints.worker`);
+                    if (item.mobile !== undefined)
+                        issues.push(`${label}: mobile is for iframe views; declarative views appear on mobile when ui.mobile is granted`);
+                }
+                if (item.mobile === true && !permissions.has('ui.mobile'))
+                    issues.push(`${label}: mobile views require the ui.mobile permission`);
+            }
             if (point.form === 'iframe') {
                 if (item.command !== undefined || item.workspace !== undefined)
                     issues.push(`${label}: iframe points take a view, not a command or workspace`);

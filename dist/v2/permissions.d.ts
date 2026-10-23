@@ -16,6 +16,13 @@ export interface PluginPermissionDefinition {
     description: string;
     risk: PluginPermissionRisk;
     status: PluginPermissionStatus;
+    /**
+     * Plugin API 2.1. An `available` permission with `developerOnly: true` is part of the contract and works,
+     * but the host only grants it while Developer mode is on (it is still being qualified). A manifest that
+     * requests it is rejected unless `allowReserved` is set, exactly like a `reserved` one. Absent means false.
+     * It is a separate field so `status` keeps meaning "shipped in the contract".
+     */
+    developerOnly?: boolean;
 }
 export declare const PLUGIN_PERMISSION_CATALOG: readonly [{
     readonly id: "library.read";
@@ -66,12 +73,6 @@ export declare const PLUGIN_PERMISSION_CATALOG: readonly [{
     readonly risk: "low";
     readonly status: "available";
 }, {
-    readonly id: "jobs.schedule";
-    readonly title: "Run background tasks";
-    readonly description: "Run tasks in the background within the limits Tape sets. They pause while Tape is busy.";
-    readonly risk: "medium";
-    readonly status: "reserved";
-}, {
     readonly id: "ui.contribute";
     readonly title: "Add to the interface";
     readonly description: "Add menu items, panels, views and settings in the places listed in the manifest.";
@@ -90,35 +91,72 @@ export declare const PLUGIN_PERMISSION_CATALOG: readonly [{
     readonly risk: "low";
     readonly status: "reserved";
 }, {
-    readonly id: "metadata.apply";
-    readonly title: "Apply approved metadata changes";
-    readonly description: "Apply a batch of metadata changes you approved, with undo.";
-    readonly risk: "medium";
-    readonly status: "reserved";
-}, {
-    readonly id: "library.organize.apply";
-    readonly title: "Apply an approved file plan";
-    readonly description: "Ask Tape to rename or move files according to a plan you approved, with undo.";
-    readonly risk: "high";
-    readonly status: "reserved";
-}, {
     readonly id: "tags.write.propose";
     readonly title: "Suggest tag writes";
     readonly description: "Suggest writing tags into audio files. You review every change.";
     readonly risk: "medium";
     readonly status: "reserved";
 }, {
+    readonly id: "library.files.read";
+    readonly title: "Read your music files";
+    readonly description: "Read the contents and details of files only inside your library folders, up to 1 MB per call. It cannot change anything.";
+    readonly risk: "high";
+    readonly status: "available";
+}, {
+    readonly id: "library.files.write";
+    readonly title: "Change your music files";
+    readonly description: "Create, overwrite, rename and move files only inside your library folders and its own plugin folder; deletions go to Tape's trash and every change can be undone.";
+    readonly risk: "high";
+    readonly status: "available";
+}, {
+    readonly id: "library.organize.apply";
+    readonly title: "Rename and move your music";
+    readonly description: "Rename and move tracks by applying organize plans, only inside your library folders; Tape updates your library and every change can be undone.";
+    readonly risk: "high";
+    readonly status: "available";
+}, {
+    readonly id: "metadata.apply";
+    readonly title: "Change track details";
+    readonly description: "Change title, artist, album, year and genre of your tracks directly; every change is recorded and can be undone.";
+    readonly risk: "medium";
+    readonly status: "available";
+}, {
     readonly id: "playlists.write";
     readonly title: "Create and edit playlists";
-    readonly description: "Create playlists and add tracks to playlists it created.";
+    readonly description: "Create playlists, and edit or delete only the playlists it created; your other playlists are never touched and every change can be undone.";
     readonly risk: "medium";
-    readonly status: "reserved";
+    readonly status: "available";
+}, {
+    readonly id: "jobs.schedule";
+    readonly title: "Run on a schedule";
+    readonly description: "Run routines in the background at most every 15 minutes, for up to 5 minutes each; they pause while Tape is busy and you can pause them any time.";
+    readonly risk: "medium";
+    readonly status: "available";
 }, {
     readonly id: "playback.control";
     readonly title: "Control playback";
-    readonly description: "Play, pause, skip and queue tracks.";
+    readonly description: "Play tracks and playlists, pause, resume, skip, seek, change the volume and add to the queue, at a limited rate.";
     readonly risk: "medium";
-    readonly status: "reserved";
+    readonly status: "available";
+}, {
+    readonly id: "audio.analyze";
+    readonly title: "See what is playing as sound";
+    readonly description: "Receive a live spectrum and level reading of what plays, only on the plugin's own pages. It cannot hear or record the audio.";
+    readonly risk: "low";
+    readonly status: "available";
+}, {
+    readonly id: "audio.process";
+    readonly title: "Change how music sounds";
+    readonly description: "Adjust Tape's built-in effects (equalizer, gain, compressor, crossfeed). It cannot run its own audio code. Developer mode only for now.";
+    readonly risk: "high";
+    readonly status: "available";
+    readonly developerOnly: true;
+}, {
+    readonly id: "ui.mobile";
+    readonly title: "Show on your phone";
+    readonly description: "Show its views in your paired Tape app and run its commands from there, with the same permissions it has on this computer.";
+    readonly risk: "medium";
+    readonly status: "available";
 }, {
     readonly id: "ui.theme";
     readonly title: "Add a theme";
